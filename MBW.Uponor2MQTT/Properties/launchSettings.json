@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "MBW.Uponor2MQTT": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
