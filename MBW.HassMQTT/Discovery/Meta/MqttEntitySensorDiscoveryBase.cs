@@ -1,6 +1,4 @@
-﻿using MBW.HassMQTT.Discovery.Meta;
-
-namespace MBW.HassMQTT.Discovery
+﻿namespace MBW.HassMQTT.Discovery.Meta
 {
     /// <summary>
     /// All MQTT entity discovery types should inherit from this.
@@ -39,6 +37,5 @@ namespace MBW.HassMQTT.Discovery
             get => GetValue<string>("payload_not_available", default);
             set => SetValue("payload_not_available", value);
         }
-
     }
 }

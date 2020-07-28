@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Resources;
 using MBW.HassMQTT.Mqtt;
 using MBW.Uponor2MQTT.UhomeUponor;
 using MBW.Uponor2MQTT.UhomeUponor.Enums;

@@ -1,4 +1,5 @@
 ﻿using MBW.HassMQTT.Discovery;
+using MBW.HassMQTT.Discovery.Meta;
 using MBW.HassMQTT.Mqtt;
 using MBW.Uponor2MQTT.HASS;
 using MBW.Uponor2MQTT.Service;

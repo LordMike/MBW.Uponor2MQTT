@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT.Discovery.Meta;
-using MBW.HassMQTT.Helpers;
 using MBW.HassMQTT.Mqtt;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

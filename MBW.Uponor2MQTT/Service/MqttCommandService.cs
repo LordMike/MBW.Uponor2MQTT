@@ -9,7 +9,6 @@ using MBW.Uponor2MQTT.Configuration;
 using MBW.Uponor2MQTT.Features;
 using MBW.Uponor2MQTT.MQTT;
 using MBW.Uponor2MQTT.UhomeUponor;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
