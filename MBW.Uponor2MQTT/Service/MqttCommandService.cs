@@ -80,6 +80,8 @@ namespace MBW.Uponor2MQTT.Service
         {
             // Skip prefix, split topic
             string[] topicLevels = argApplicationMessage.Topic.Substring(_topicPrefix.Length + 1).Split('/');
+            
+            _logger.LogDebug("Received {Topic}, value {Value}", argApplicationMessage.Topic, argApplicationMessage.ConvertPayloadToString());
 
             foreach ((string[] filter, ICommandHandler handler) in _handlers)
             {
@@ -98,6 +100,8 @@ namespace MBW.Uponor2MQTT.Service
 
                 if (!wasMatch)
                     continue;
+
+                _logger.LogDebug("Received {Topic} matches {Handler}", argApplicationMessage.Topic, handler.ToString());
 
                 try
                 {

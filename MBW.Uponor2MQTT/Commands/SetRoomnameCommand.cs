@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using MBW.Uponor2MQTT.Features;
 using MBW.Uponor2MQTT.UhomeUponor;
 using MBW.Uponor2MQTT.UhomeUponor.Enums;
+using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Client;
 
@@ -11,14 +12,16 @@ namespace MBW.Uponor2MQTT.Commands
 {
     internal class SetRoomnameCommand : ICommandHandler
     {
+        private readonly ILogger<SetRoomnameCommand> _logger;
         private readonly IMqttClient _mqqClient;
         private readonly UhomeUponorClient _client;
         private readonly FeatureManager _featureManager;
         private readonly SensorStore _sensorStore;
         private readonly Regex _thermostatRegex = new Regex(@"^uponor_c(?<controller>[0-9]+)_t(?<thermostat>[0-9]+)$", RegexOptions.Compiled);
 
-        public SetRoomnameCommand(IMqttClient mqqClient, UhomeUponorClient client, FeatureManager featureManager, SensorStore sensorStore)
+        public SetRoomnameCommand(ILogger<SetRoomnameCommand> logger, IMqttClient mqqClient, UhomeUponorClient client, FeatureManager featureManager, SensorStore sensorStore)
         {
+            _logger = logger;
             _mqqClient = mqqClient;
             _client = client;
             _featureManager = featureManager;
@@ -40,6 +43,8 @@ namespace MBW.Uponor2MQTT.Commands
             int obj = UponorObjects.Thermostat(UponorThermostats.RoomName, controller, thermostat);
 
             string newName = message.ConvertPayloadToString();
+
+            _logger.LogInformation("Setting c{Controller} t{Thermostat} name to {Value}", controller, thermostat, newName);
 
             await _client.SetValue(obj, UponorProperties.Value, newName, token);
 

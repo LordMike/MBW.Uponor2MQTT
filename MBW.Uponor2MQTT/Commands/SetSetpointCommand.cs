@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MBW.Uponor2MQTT.Features;
 using MBW.Uponor2MQTT.UhomeUponor;
 using MBW.Uponor2MQTT.UhomeUponor.Enums;
+using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Client;
 
@@ -12,6 +13,7 @@ namespace MBW.Uponor2MQTT.Commands
 {
     internal class SetSetpointCommand : ICommandHandler
     {
+        private readonly ILogger<SetSetpointCommand> _logger;
         private readonly IMqttClient _mqqClient;
         private readonly UhomeUponorClient _client;
         private readonly FeatureManager _featureManager;
@@ -19,8 +21,9 @@ namespace MBW.Uponor2MQTT.Commands
         private readonly CultureInfo _parsingCulture = CultureInfo.InvariantCulture;
         private readonly Regex _thermostatRegex = new Regex(@"^uponor_c(?<controller>[0-9]+)_t(?<thermostat>[0-9]+)$", RegexOptions.Compiled);
 
-        public SetSetpointCommand(IMqttClient mqqClient, UhomeUponorClient client, FeatureManager featureManager, SensorStore sensorStore)
+        public SetSetpointCommand(ILogger<SetSetpointCommand> logger, IMqttClient mqqClient, UhomeUponorClient client, FeatureManager featureManager, SensorStore sensorStore)
         {
+            _logger = logger;
             _mqqClient = mqqClient;
             _client = client;
             _featureManager = featureManager;
@@ -43,6 +46,8 @@ namespace MBW.Uponor2MQTT.Commands
 
             string convertPayloadToString = message.ConvertPayloadToString();
             float newSetpoint = float.Parse(convertPayloadToString, _parsingCulture);
+
+            _logger.LogInformation("Setting c{Controller} t{Thermostat} setpoint to {Value}", controller, thermostat,newSetpoint);
 
             await _client.SetValue(obj, UponorProperties.Value, newSetpoint, token);
 
