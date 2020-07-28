@@ -249,6 +249,7 @@ namespace MBW.Uponor2MQTT.Service
                 climate.TemperatureCommandTopic = _topicBuilder.GetEntityTopic(deviceId, "temp", "set_setpoint");
                 climate.TemperatureStateTopic = _topicBuilder.GetEntityTopic(deviceId, "temp", "setpoint");
                 climate.Precision = 0.1f;
+                climate.TempStep = 0.5f;
 
                 if (values.TryGetValue(UponorObjects.Thermostat(UponorThermostats.MinSetpoint, controller, thermostat),
                     UponorProperties.Value, out float floatVal))
