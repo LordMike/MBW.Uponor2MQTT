@@ -69,6 +69,7 @@ namespace MBW.HassMQTT.Discovery.Meta
             // TODO: _logger.Debug("Publishing discovery doc to {topic} for {uniqueId}", _topic, UniqueId);
             await mqttClient.SendJsonAsync(_topic, _discover, cancellationToken);
 
+            Dirty = false;
             return true;
         }
     }
