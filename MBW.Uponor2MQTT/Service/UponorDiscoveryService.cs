@@ -227,8 +227,8 @@ namespace MBW.Uponor2MQTT.Service
                 // Name
                 string deviceName = $"Thermostat {controller}.{thermostat}";
                 if (values.TryGetValue(UponorObjects.Thermostat(UponorThermostats.RoomName, controller, thermostat),
-                    UponorProperties.Value, out string stringVal))
-                    deviceName = stringVal ?? deviceName;
+                    UponorProperties.Value, out string stringVal) && !string.IsNullOrWhiteSpace(stringVal))
+                    deviceName = stringVal;
 
                 // Climate
                 MqttClimate climate = _sensorStore.Configure<MqttClimate>(deviceId, "temp");

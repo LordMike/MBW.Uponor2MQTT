@@ -171,9 +171,7 @@ namespace MBW.Uponor2MQTT
                 .AddHttpClient("uponor")
                 .AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(new[]
                 {
-                    TimeSpan.FromSeconds(1), 
-                    //TimeSpan.FromSeconds(30),
-                    //TimeSpan.FromSeconds(60)
+                    TimeSpan.FromSeconds(30)
                 }))
                 .ConfigurePrimaryHttpMessageHandler(provider =>
                 {
