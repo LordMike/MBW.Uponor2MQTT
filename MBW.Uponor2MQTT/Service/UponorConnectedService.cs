@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using MBW.HassMQTT.Discovery;
-using MBW.HassMQTT.Enum;
+using MBW.HassMQTT;
+using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Models;
 using MBW.HassMQTT.Mqtt;
-using MBW.Uponor2MQTT.Features;
 using MBW.Uponor2MQTT.HASS;
 using MBW.Uponor2MQTT.Helpers;
 using MBW.Uponor2MQTT.UhomeUponor;
@@ -59,7 +59,7 @@ namespace MBW.Uponor2MQTT.Service
             MqttAttributesTopic attributes = _sensorStore.GetAttributesValue(_attributesTopic);
             MqttValueTopic state = _sensorStore.GetStateValue(_stateTopic);
 
-            state.Set(OkMessage);
+            state.Value = OkMessage;
             attributes.SetAttribute("last_ok", DateTime.UtcNow.ToString("O"));
 
             _shouldFlush.Set();
@@ -70,7 +70,7 @@ namespace MBW.Uponor2MQTT.Service
             MqttAttributesTopic attributes = _sensorStore.GetAttributesValue(_attributesTopic);
             MqttValueTopic state = _sensorStore.GetStateValue(_stateTopic);
 
-            state.Set(ProblemMessage);
+            state.Value = ProblemMessage;
             attributes.SetAttribute("last_bad", DateTime.UtcNow.ToString("O"));
             attributes.SetAttribute("last_bad_status", message);
 
@@ -79,9 +79,6 @@ namespace MBW.Uponor2MQTT.Service
 
         private async Task FlushingTask(CancellationToken cancellationToken)
         {
-            MqttAttributesTopic attributes = _sensorStore.GetAttributesValue(_attributesTopic);
-            MqttValueTopic state = _sensorStore.GetStateValue(_stateTopic);
-
             while (!cancellationToken.IsCancellationRequested)
             {
                 // Sleep for desired time
@@ -92,8 +89,7 @@ namespace MBW.Uponor2MQTT.Service
                 await _shouldFlush.WaitAsync(cancellationToken);
 
                 // Flush our values
-                await attributes.Flush(_mqttClient, cancellationToken: cancellationToken);
-                await state.Flush(_mqttClient, cancellationToken: cancellationToken);
+                await _sensorStore.FlushAll(_mqttClient, cancellationToken);
             }
         }
 

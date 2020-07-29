@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 using System.Text;
 using EnumsNET;
-using MBW.HassMQTT.Discovery.Meta;
-using MBW.HassMQTT.Helpers;
+using MBW.HassMQTT.DiscoveryModels;
+using MBW.HassMQTT.DiscoveryModels.Helpers;
 
 namespace MBW.HassMQTT.Mqtt
 {

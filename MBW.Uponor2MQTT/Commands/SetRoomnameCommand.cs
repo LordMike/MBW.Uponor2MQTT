@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using MBW.HassMQTT;
 using MBW.Uponor2MQTT.Features;
 using MBW.Uponor2MQTT.UhomeUponor;
 using MBW.Uponor2MQTT.UhomeUponor.Enums;

@@ -1,5 +1,5 @@
 ﻿using System;
-using MBW.HassMQTT.Mqtt;
+using MBW.HassMQTT;
 using MBW.Uponor2MQTT.UhomeUponor;
 using MBW.Uponor2MQTT.UhomeUponor.Enums;
 
@@ -23,7 +23,7 @@ namespace MBW.Uponor2MQTT.Features
 
         public override void Process(UponorResponseContainer values)
         {
-            state.Set("discovered");
+            state.Value = "discovered";
 
             if (values.TryGetValue(UponorObjects.System(UponorSystem.DeviceObject), UponorProperties.ApplicationVersion, out object val))
                 attributes.SetAttribute("application_version", val);

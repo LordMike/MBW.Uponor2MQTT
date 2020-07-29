@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MBW.HassMQTT.Mqtt;
+using MBW.HassMQTT;
 using MBW.Uponor2MQTT.UhomeUponor;
 using MBW.Uponor2MQTT.UhomeUponor.Enums;
 
@@ -35,9 +35,9 @@ namespace MBW.Uponor2MQTT.Features
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.BatteryAlarm, controller, thermostat),
                     UponorProperties.Value, out object objVal) && objVal != null)
-                    sensor.Set(BatteryLow);
+                    sensor.Value = BatteryLow;
                 else
-                    sensor.Set(BatteryOk);
+                    sensor.Value = BatteryOk;
 
                 // Alarm sensor
                 topic = TopicBuilder.GetEntityTopic(deviceId, "alarms", "state");
@@ -81,12 +81,12 @@ namespace MBW.Uponor2MQTT.Features
 
                 if (problems.Any())
                 {
-                    sensor.Set("on");
+                    sensor.Value = "on";
                     attributes.SetAttribute("problem", string.Join(", ", problems));
                 }
                 else
                 {
-                    sensor.Set("off");
+                    sensor.Value = "off";
                     attributes.SetAttribute("problem", string.Empty);
                 }
             }

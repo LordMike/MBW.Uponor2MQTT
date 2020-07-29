@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using MBW.HassMQTT.Discovery;
-using MBW.HassMQTT.Enum;
+using MBW.HassMQTT;
+using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Models;
 using MBW.HassMQTT.Mqtt;
-using MBW.Uponor2MQTT.Features;
 using MBW.Uponor2MQTT.HASS;
 using MBW.Uponor2MQTT.Helpers;
 using Microsoft.Extensions.Hosting;

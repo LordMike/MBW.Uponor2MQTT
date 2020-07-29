@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MBW.HassMQTT;
 using MBW.HassMQTT.Mqtt;
 using MBW.Uponor2MQTT.Commands;
 using MBW.Uponor2MQTT.Configuration;

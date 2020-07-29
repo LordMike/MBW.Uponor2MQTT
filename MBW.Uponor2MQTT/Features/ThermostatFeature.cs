@@ -1,5 +1,5 @@
 ﻿using System;
-using MBW.HassMQTT.Mqtt;
+using MBW.HassMQTT;
 using MBW.Uponor2MQTT.UhomeUponor;
 using MBW.Uponor2MQTT.UhomeUponor.Enums;
 
@@ -28,7 +28,7 @@ namespace MBW.Uponor2MQTT.Features
                     UponorObjects.Thermostat(UponorThermostats.RoomTemperature, controller, thermostat),
                     UponorProperties.Value, out object objVal))
                 {
-                    sensor.Set(objVal);
+                    sensor.Value = objVal;
                 }
 
                 // Setpoint
@@ -39,7 +39,7 @@ namespace MBW.Uponor2MQTT.Features
                     UponorObjects.Thermostat(UponorThermostats.RoomSetpoint, controller, thermostat),
                     UponorProperties.Value, out objVal))
                 {
-                    sensor.Set(objVal);
+                    sensor.Value = objVal;
                 }
 
                 // Action & Mode
@@ -75,8 +75,8 @@ namespace MBW.Uponor2MQTT.Features
 
                     mode = "auto";
 
-                    sensor.Set(action);
-                    modeSensor.Set(mode);
+                    sensor.Value = action;
+                    modeSensor.Value = mode;
                 }
 
                 // Home/away
@@ -89,10 +89,10 @@ namespace MBW.Uponor2MQTT.Features
                 {
                     if (intVal > 0)
                         // Away
-                        sensor.Set("on");
+                        sensor.Value = "on";
                     else
                         // Home
-                        sensor.Set("off");
+                        sensor.Value = "off";
                 }
             }
         }

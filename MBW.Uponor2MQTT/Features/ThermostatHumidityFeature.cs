@@ -1,5 +1,5 @@
 ﻿using System;
-using MBW.HassMQTT.Mqtt;
+using MBW.HassMQTT;
 using MBW.Uponor2MQTT.UhomeUponor;
 using MBW.Uponor2MQTT.UhomeUponor.Enums;
 
@@ -27,7 +27,7 @@ namespace MBW.Uponor2MQTT.Features
                 if (values.TryGetValue(UponorObjects.Thermostat(UponorThermostats.RhValue, controller, thermostat),
                     UponorProperties.Value, out object objVal))
                 {
-                    sensor.Set(objVal);
+                    sensor.Value = objVal;
                 }
             }
         }

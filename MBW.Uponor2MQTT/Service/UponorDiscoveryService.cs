@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MBW.HassMQTT.Discovery;
-using MBW.HassMQTT.Discovery.Meta;
+using MBW.HassMQTT;
+using MBW.HassMQTT.DiscoveryModels;
+using MBW.HassMQTT.DiscoveryModels.Models;
 using MBW.HassMQTT.Mqtt;
 using MBW.Uponor2MQTT.Configuration;
 using MBW.Uponor2MQTT.Features;
@@ -16,7 +17,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MQTTnet.Client;
-using HassDeviceClass = MBW.HassMQTT.Enum.HassDeviceClass;
+using HassDeviceClass = MBW.HassMQTT.DiscoveryModels.Enum.HassDeviceClass;
 
 namespace MBW.Uponor2MQTT.Service
 {

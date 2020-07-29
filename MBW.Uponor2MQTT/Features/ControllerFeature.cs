@@ -1,5 +1,5 @@
 ﻿using System;
-using MBW.HassMQTT.Mqtt;
+using MBW.HassMQTT;
 using MBW.Uponor2MQTT.UhomeUponor;
 using MBW.Uponor2MQTT.UhomeUponor.Enums;
 
@@ -30,7 +30,7 @@ namespace MBW.Uponor2MQTT.Features
                 MqttValueTopic sensor = SensorStore.GetStateValue(stateTopic);
                 MqttAttributesTopic attributes = SensorStore.GetAttributesValue(attributesTopic);
 
-                sensor.Set("discovered");
+                sensor.Value = "discovered";
                 attributes.SetAttribute("sw_version", val);
             }
         }
