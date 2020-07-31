@@ -42,7 +42,7 @@ namespace MBW.Uponor2MQTT.Features
 
                 // Action & Mode
                 sensor = HassMqttManager.GetEntityStateValue(deviceId, "temp", "action");
-                var modeSensor = HassMqttManager.GetEntityStateValue(deviceId, "temp", "mode");
+                MqttStateValueTopic modeSensor = HassMqttManager.GetEntityStateValue(deviceId, "temp", "mode");
 
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.RoomInDemand, controller, thermostat),

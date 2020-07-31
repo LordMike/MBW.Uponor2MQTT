@@ -212,7 +212,7 @@ namespace MBW.UponorApi
                 UponorResponse<UponorParams> resp = JsonConvert.DeserializeObject<UponorResponse<UponorParams>>(resJson);
 
                 foreach (UponorObject o in resp.Result.Objects)
-                    foreach (var prop in o.Properties)
+                    foreach (KeyValuePair<int, UponorValueContainer> prop in o.Properties)
                         responseContainer.AddResponse(Convert.ToInt32(o.Id), (UponorProperties)prop.Key, prop.Value.Value);
             }
 

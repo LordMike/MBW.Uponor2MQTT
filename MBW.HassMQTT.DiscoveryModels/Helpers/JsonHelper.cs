@@ -24,25 +24,53 @@ namespace MBW.HassMQTT.DiscoveryModels.Helpers
                 return;
             }
 
-            if (obj.TryGetValue(name, out JToken val) && val != null)
+            void Overwrite()
             {
-                // Compare
-                T existing = val.Value<T>();
-
-                if (!ComparisonHelper.IsSameValue(existing, newValue))
-                {
-                    obj[name] = JToken.FromObject(newValue);
-                    onSet();
-                }
-            }
-            else
-            {
-                // Not set
                 obj[name] = JToken.FromObject(newValue);
                 onSet();
             }
 
-            // TODO: _logger.Verbose("Setting attribute {name} to {value}, for {topic}", name, value, _topic);
+            if (obj.TryGetValue(name, out JToken val) && val != null)
+            {
+                // Compare
+                if (newValue is Array newArray && val is JArray existingArray)
+                {
+                    if (newArray.Length != existingArray.Count)
+                    {
+                        Overwrite();
+                        return;
+                    }
+
+                    // Compare each value
+                    for (int i = 0; i < newArray.Length; i++)
+                    {
+                        // TODO: Other types
+                        if (!ComparisonHelper.IsSameValue(newArray.GetValue(i), existingArray.Value<string>(i)))
+                        {
+                            Overwrite();
+                            return;
+                        }
+                    }
+
+                    // No difference
+                }
+                else
+                {
+                    T existing = val.Value<T>();
+
+                    if (!ComparisonHelper.IsSameValue(existing, newValue))
+                    {
+                        Overwrite();
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                // Not previously set
+                Overwrite();
+                return;
+            }
         }
     }
 }

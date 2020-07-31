@@ -10,6 +10,7 @@ using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Client;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace MBW.HassMQTT
@@ -84,11 +85,25 @@ namespace MBW.HassMQTT
         private async Task SendValue(IMqttValueContainer container, bool resetDirty, CancellationToken token)
         {
             object value = container.GetSerializedValue(resetDirty);
+            bool log = _logger.IsEnabled(LogLevel.Debug);
 
+            object sentValue = default;
             if (value is string str)
+            {
+                sentValue = str;
                 await _mqttClient.SendValueAsync(container.PublishTopic, str, token);
+            }
             else
-                await _mqttClient.SendJsonAsync(container.PublishTopic, JToken.FromObject(value), token);
+            {
+                JToken converted = JToken.FromObject(value);
+                await _mqttClient.SendJsonAsync(container.PublishTopic, converted, token);
+
+                if (log)
+                    sentValue = converted.ToString(Formatting.None);
+            }
+
+            if (log)
+                _logger.LogDebug("Pushed {Value} to {Topic}", sentValue, container.PublishTopic);
         }
 
         public async Task FlushAll(CancellationToken token = default)
