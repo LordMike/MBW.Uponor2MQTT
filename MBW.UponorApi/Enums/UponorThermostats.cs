@@ -1,6 +1,6 @@
-﻿namespace MBW.Uponor2MQTT.UhomeUponor.Enums
+﻿namespace MBW.UponorApi.Enums
 {
-    internal enum UponorThermostats
+    public enum UponorThermostats
     {
         EcoProfileActiveCf = 0,
         DehumidifierControlActivation = 1,

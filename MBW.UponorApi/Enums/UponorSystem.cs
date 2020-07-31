@@ -1,6 +1,6 @@
-﻿namespace MBW.Uponor2MQTT.UhomeUponor.Enums
+﻿namespace MBW.UponorApi.Enums
 {
-    internal enum UponorSystem
+    public enum UponorSystem
     {
         DeviceObject = 1,
         SerialPort1 = 2,

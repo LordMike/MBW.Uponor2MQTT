@@ -1,8 +1,8 @@
-﻿using MBW.Uponor2MQTT.UhomeUponor.Objects;
+﻿using MBW.UponorApi.Objects;
 
-namespace MBW.Uponor2MQTT.UhomeUponor
+namespace MBW.UponorApi
 {
-    internal class SystemProperties
+    public class SystemProperties
     {
         public int[] AvailableControllers { get; set; }
 

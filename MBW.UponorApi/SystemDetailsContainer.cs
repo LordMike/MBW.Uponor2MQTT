@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MBW.Uponor2MQTT.UhomeUponor
+namespace MBW.UponorApi
 {
     /// <summary>
     /// Thread safe container for controller & thermostats
     /// </summary>
-    internal class SystemDetailsContainer
+    public class SystemDetailsContainer
     {
         private Container _container;
 

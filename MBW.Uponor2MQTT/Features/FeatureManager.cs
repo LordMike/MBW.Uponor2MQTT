@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using MBW.Uponor2MQTT.UhomeUponor;
+using MBW.UponorApi;
 using Microsoft.Extensions.Logging;
 
 namespace MBW.Uponor2MQTT.Features

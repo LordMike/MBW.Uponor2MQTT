@@ -1,6 +1,6 @@
-﻿namespace MBW.Uponor2MQTT.UhomeUponor.Enums
+﻿namespace MBW.UponorApi.Enums
 {
-    internal enum UponorProperties
+    public enum UponorProperties
     {
         ApplicationVersion = 12,
         Unknown22 = 22,

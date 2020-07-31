@@ -7,7 +7,7 @@ using MBW.HassMQTT.DiscoveryModels.Models;
 using MBW.HassMQTT.Mqtt;
 using MBW.Uponor2MQTT.HASS;
 using MBW.Uponor2MQTT.Helpers;
-using MBW.Uponor2MQTT.UhomeUponor;
+using MBW.UponorApi;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Client;

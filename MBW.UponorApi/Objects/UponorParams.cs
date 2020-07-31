@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace MBW.Uponor2MQTT.UhomeUponor.Objects
+namespace MBW.UponorApi.Objects
 {
     internal class UponorParams
     {

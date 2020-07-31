@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace MBW.Uponor2MQTT.UhomeUponor.Objects
+namespace MBW.UponorApi.Objects
 {
     public class UponorWhoiseResponse
     {

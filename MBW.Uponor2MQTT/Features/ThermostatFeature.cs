@@ -1,7 +1,7 @@
 ﻿using System;
 using MBW.HassMQTT;
-using MBW.Uponor2MQTT.UhomeUponor;
-using MBW.Uponor2MQTT.UhomeUponor.Enums;
+using MBW.UponorApi;
+using MBW.UponorApi.Enums;
 
 namespace MBW.Uponor2MQTT.Features
 {

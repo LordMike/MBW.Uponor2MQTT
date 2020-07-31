@@ -2,7 +2,7 @@
 using MBW.HassMQTT;
 using MBW.HassMQTT.Mqtt;
 using MBW.Uponor2MQTT.HASS;
-using MBW.Uponor2MQTT.UhomeUponor;
+using MBW.UponorApi;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MBW.Uponor2MQTT.Features

@@ -1,10 +1,10 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using MBW.Uponor2MQTT.UhomeUponor.Enums;
+using MBW.UponorApi.Enums;
 
-namespace MBW.Uponor2MQTT.UhomeUponor
+namespace MBW.UponorApi
 {
-    internal static class UhomeUponorClientExtensions
+    public static class UhomeUponorClientExtensions
     {
         public static Task SetValue(this UhomeUponorClient client, int @object, UponorProperties property, object value, CancellationToken token = default)
         {

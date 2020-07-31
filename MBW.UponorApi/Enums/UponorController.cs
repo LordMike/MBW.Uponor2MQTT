@@ -1,6 +1,6 @@
-﻿namespace MBW.Uponor2MQTT.UhomeUponor.Enums
+﻿namespace MBW.UponorApi.Enums
 {
-    internal enum UponorController
+    public enum UponorController
     {
         OutputModule = 0,
         RhDeadzone = 1,

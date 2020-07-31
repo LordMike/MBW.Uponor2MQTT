@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MBW.Uponor2MQTT.UhomeUponor.Enums;
+using MBW.UponorApi.Enums;
 using Newtonsoft.Json;
 
-namespace MBW.Uponor2MQTT.UhomeUponor
+namespace MBW.UponorApi
 {
-    internal class UponorResponseContainer
+    public class UponorResponseContainer
     {
         [JsonProperty]
         private Dictionary<int, Dictionary<UponorProperties, object>> _values = new Dictionary<int, Dictionary<UponorProperties, object>>();
@@ -66,8 +66,8 @@ namespace MBW.Uponor2MQTT.UhomeUponor
             if (!_values.TryGetValue(@object, out Dictionary<UponorProperties, object> values))
                 yield break;
 
-            foreach ((UponorProperties property, object value) in values)
-                yield return (property, value);
+            foreach (KeyValuePair<UponorProperties, object> item in values)
+                yield return (item.Key, item.Value);
         }
 
         public IEnumerable<(int @object, UponorProperties property, object value)> GetValues()

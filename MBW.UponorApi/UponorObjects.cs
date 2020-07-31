@@ -1,8 +1,8 @@
-﻿using MBW.Uponor2MQTT.UhomeUponor.Enums;
+﻿using MBW.UponorApi.Enums;
 
-namespace MBW.Uponor2MQTT.UhomeUponor
+namespace MBW.UponorApi
 {
-    internal static class UponorObjects
+    public static class UponorObjects
     {
         public static int System(UponorSystem @object)
         {

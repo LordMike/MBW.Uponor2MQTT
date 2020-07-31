@@ -4,16 +4,16 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using MBW.Uponor2MQTT.Configuration;
-using MBW.Uponor2MQTT.UhomeUponor.Enums;
-using MBW.Uponor2MQTT.UhomeUponor.Objects;
+using MBW.UponorApi.Configuration;
+using MBW.UponorApi.Enums;
+using MBW.UponorApi.Objects;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
-namespace MBW.Uponor2MQTT.UhomeUponor
+namespace MBW.UponorApi
 {
-    internal class UhomeUponorClient
+    public class UhomeUponorClient
     {
         private const int PropertiesPerRequest = 50;
         private const int MaxControllers = 4;
@@ -215,8 +215,8 @@ namespace MBW.Uponor2MQTT.UhomeUponor
                 UponorResponse<UponorParams> resp = JsonConvert.DeserializeObject<UponorResponse<UponorParams>>(resJson);
 
                 foreach (UponorObject o in resp.Result.Objects)
-                    foreach ((int property, UponorValueContainer value) in o.Properties)
-                        responseContainer.AddResponse(Convert.ToInt32(o.Id), (UponorProperties)property, value.Value);
+                    foreach (var prop in o.Properties)
+                        responseContainer.AddResponse(Convert.ToInt32(o.Id), (UponorProperties)prop.Key, prop.Value);
             }
 
             return responseContainer;

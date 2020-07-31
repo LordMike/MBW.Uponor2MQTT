@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace MBW.Uponor2MQTT.Configuration
+namespace MBW.UponorApi.Configuration
 {
-    internal class UponorConfiguration
+    public class UponorConfiguration
     {
         public Uri Host { get; set; }
 
