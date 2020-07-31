@@ -29,7 +29,7 @@ namespace MBW.Uponor2MQTT.Features
 
                 // Battery sensor
                 // We don't know what the battery level is with Uponor. So we can only say it's "good" or "bad"
-                MqttValueTopic sensor = HassMqttManager.GetEntityStateValue(deviceId, "battery", "state");
+                MqttStateValueTopic sensor = HassMqttManager.GetEntityStateValue(deviceId, "battery", "state");
 
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.BatteryAlarm, controller, thermostat),

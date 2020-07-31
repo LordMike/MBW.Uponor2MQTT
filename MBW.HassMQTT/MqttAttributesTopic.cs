@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
-using Newtonsoft.Json.Linq;
+using MBW.HassMQTT.Interfaces;
 
 namespace MBW.HassMQTT
 {
-    public class MqttAttributesTopic
+    public class MqttAttributesTopic : IMqttValueContainer
     {
         public string Topic { get; }
         public bool Dirty { get; private set; }
@@ -15,6 +15,12 @@ namespace MBW.HassMQTT
         {
             Topic = topic;
             _attributes = new Dictionary<string, object>();
+        }
+
+        public void RemoveAttribute(string name)
+        {
+            if (_attributes.Remove(name))
+                Dirty = true;
         }
 
         public void SetAttribute(string name, object value)
@@ -30,18 +36,16 @@ namespace MBW.HassMQTT
             if (_attributes.TryGetValue(name, out var existing) && ComparisonHelper.IsSameValue(existing, value))
                 return;
 
-            // TODO: _logger.Verbose("Setting attribute {name} to {value}, for {topic}", name, value, _topic);
-
-            _attributes[name] = JToken.FromObject(value);
+            _attributes[name] = value;
             Dirty = true;
         }
 
-        public JObject GetJsonObject(bool resetDirty)
+        public object GetSerializedValue(bool resetDirty)
         {
             if (resetDirty)
                 Dirty = false;
 
-            return JObject.FromObject(_attributes);
+            return _attributes;
         }
     }
 }

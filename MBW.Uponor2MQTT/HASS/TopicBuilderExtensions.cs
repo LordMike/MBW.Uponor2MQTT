@@ -5,7 +5,7 @@ namespace MBW.Uponor2MQTT.HASS
 {
     internal static class TopicBuilderExtensions
     {
-        public static MqttValueTopic GetSystemValue(this HassMqttManager manager, string name)
+        public static MqttStateValueTopic GetSystemValue(this HassMqttManager manager, string name)
         {
             // <prefix>/system/<name>
             return manager.GetServiceStateValue("system", name);

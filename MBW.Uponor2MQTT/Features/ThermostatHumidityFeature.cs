@@ -21,7 +21,7 @@ namespace MBW.Uponor2MQTT.Features
                 string deviceId = IdBuilder.GetThermostatId(controller, thermostat);
 
                 // Humidity
-                MqttValueTopic sensor = HassMqttManager.GetEntityStateValue(deviceId, "humidity", "state");
+                MqttStateValueTopic sensor = HassMqttManager.GetEntityStateValue(deviceId, "humidity", "state");
 
                 if (values.TryGetValue(UponorObjects.Thermostat(UponorThermostats.RhValue, controller, thermostat),
                     UponorProperties.Value, out object objVal))

@@ -18,6 +18,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MBW.HassMQTT.DiscoveryModel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MBW.UponorApi", "MBW.UponorApi\MBW.UponorApi.csproj", "{A63C4247-C6CF-4C49-A5AC-8D7760797B09}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MBW.HassMQTT.Abstracts", "MBW.HassMQTT.Abstracts\MBW.HassMQTT.Abstracts.csproj", "{E9C5BE1F-93D3-4A76-A174-FE3E99718209}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,18 @@ Global
 		{A63C4247-C6CF-4C49-A5AC-8D7760797B09}.Release|x64.Build.0 = Release|Any CPU
 		{A63C4247-C6CF-4C49-A5AC-8D7760797B09}.Release|x86.ActiveCfg = Release|Any CPU
 		{A63C4247-C6CF-4C49-A5AC-8D7760797B09}.Release|x86.Build.0 = Release|Any CPU
+		{E9C5BE1F-93D3-4A76-A174-FE3E99718209}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9C5BE1F-93D3-4A76-A174-FE3E99718209}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9C5BE1F-93D3-4A76-A174-FE3E99718209}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{E9C5BE1F-93D3-4A76-A174-FE3E99718209}.Debug|x64.Build.0 = Debug|Any CPU
+		{E9C5BE1F-93D3-4A76-A174-FE3E99718209}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{E9C5BE1F-93D3-4A76-A174-FE3E99718209}.Debug|x86.Build.0 = Debug|Any CPU
+		{E9C5BE1F-93D3-4A76-A174-FE3E99718209}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9C5BE1F-93D3-4A76-A174-FE3E99718209}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9C5BE1F-93D3-4A76-A174-FE3E99718209}.Release|x64.ActiveCfg = Release|Any CPU
+		{E9C5BE1F-93D3-4A76-A174-FE3E99718209}.Release|x64.Build.0 = Release|Any CPU
+		{E9C5BE1F-93D3-4A76-A174-FE3E99718209}.Release|x86.ActiveCfg = Release|Any CPU
+		{E9C5BE1F-93D3-4A76-A174-FE3E99718209}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

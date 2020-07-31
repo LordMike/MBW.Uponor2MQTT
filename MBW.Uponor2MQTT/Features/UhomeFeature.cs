@@ -8,7 +8,7 @@ namespace MBW.Uponor2MQTT.Features
     internal class UhomeFeature : FeatureBase
     {
         private readonly MqttAttributesTopic attributes;
-        private readonly MqttValueTopic state;
+        private readonly MqttStateValueTopic state;
 
         public UhomeFeature(IServiceProvider serviceProvider) : base(serviceProvider)
         {

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT.DiscoveryModels;
 using MBW.HassMQTT.Helpers;
+using MBW.HassMQTT.Interfaces;
 using MBW.HassMQTT.Mqtt;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -21,7 +22,7 @@ namespace MBW.HassMQTT
         private readonly HassMqttTopicBuilder _topicBuilder;
         private readonly ILogger<HassMqttManager> _logger;
         private readonly Dictionary<string, MqttSensorDiscoveryBase> _discoveryDocuments;
-        private readonly Dictionary<string, MqttValueTopic> _values;
+        private readonly Dictionary<string, MqttStateValueTopic> _values;
         private readonly Dictionary<string, MqttAttributesTopic> _attributes;
 
         public HassMqttManager(IServiceProvider serviceProvider, IMqttClient mqttClient, HassMqttTopicBuilder topicBuilder, ILogger<HassMqttManager> logger)
@@ -31,7 +32,7 @@ namespace MBW.HassMQTT
             _topicBuilder = topicBuilder;
             _logger = logger;
             _discoveryDocuments = new Dictionary<string, MqttSensorDiscoveryBase>(StringComparer.OrdinalIgnoreCase);
-            _values = new Dictionary<string, MqttValueTopic>(StringComparer.OrdinalIgnoreCase);
+            _values = new Dictionary<string, MqttStateValueTopic>(StringComparer.OrdinalIgnoreCase);
             _attributes = new Dictionary<string, MqttAttributesTopic>(StringComparer.OrdinalIgnoreCase);
         }
 
@@ -59,41 +60,35 @@ namespace MBW.HassMQTT
 
             return _attributes[topic] = new MqttAttributesTopic(topic);
         }
-        
-        public MqttValueTopic GetServiceStateValue(string deviceId, string entityId)
+
+        public MqttStateValueTopic GetServiceStateValue(string deviceId, string entityId)
         {
             string topic = _topicBuilder.GetServiceTopic(deviceId, entityId);
 
-            if (_values.TryGetValue(topic, out MqttValueTopic sensor))
+            if (_values.TryGetValue(topic, out MqttStateValueTopic sensor))
                 return sensor;
 
-            return _values[topic] = new MqttValueTopic(topic);
+            return _values[topic] = new MqttStateValueTopic(topic);
         }
 
-        public MqttValueTopic GetEntityStateValue(string deviceId, string entityId, string kind)
+        public MqttStateValueTopic GetEntityStateValue(string deviceId, string entityId, string kind)
         {
             string topic = _topicBuilder.GetEntityTopic(deviceId, entityId, kind);
 
-            if (_values.TryGetValue(topic, out MqttValueTopic sensor))
+            if (_values.TryGetValue(topic, out MqttStateValueTopic sensor))
                 return sensor;
 
-            return _values[topic] = new MqttValueTopic(topic);
+            return _values[topic] = new MqttStateValueTopic(topic);
         }
 
-        public MqttValueTopic GetStateValue1(string topic)
+        private async Task SendValue(IMqttValueContainer container, bool resetDirty, CancellationToken token)
         {
-            if (_values.TryGetValue(topic, out MqttValueTopic sensor))
-                return sensor;
+            var value = container.GetSerializedValue(resetDirty);
 
-            return _values[topic] = new MqttValueTopic(topic);
-        }
-
-        public MqttAttributesTopic GetAttributesValue1(string topic)
-        {
-            if (_attributes.TryGetValue(topic, out MqttAttributesTopic sensor))
-                return sensor;
-
-            return _attributes[topic] = new MqttAttributesTopic(topic);
+            if (value is string str)
+                await _mqttClient.SendValueAsync(container.Topic, str, token);
+            else
+                await _mqttClient.SendJsonAsync(container.Topic, JToken.FromObject(value), token);
         }
 
         public async Task FlushAll(CancellationToken token = default)
@@ -110,26 +105,19 @@ namespace MBW.HassMQTT
 
                 foreach (MqttSensorDiscoveryBase value in _discoveryDocuments.Values.Where(s => s.Dirty))
                 {
-                    await _mqttClient.SendJsonAsync(value.Topic, value.GetJsonObject(true), token);
+                    await SendValue(value, true, token);
                     discoveryDocs++;
                 }
 
-                foreach (MqttValueTopic value in _values.Values.Where(s => s.Dirty))
+                foreach (MqttStateValueTopic value in _values.Values.Where(s => s.Dirty))
                 {
-                    // Apply cursory conversion to state value
-                    object toSend = value.GetValue(true);
-
-                    if (toSend is string str)
-                        await _mqttClient.SendValueAsync(value.Topic, str, token);
-                    else
-                        await _mqttClient.SendJsonAsync(value.Topic, JToken.FromObject(value.Value), token);
-
+                    await SendValue(value, true, token);
                     values++;
                 }
 
                 foreach (MqttAttributesTopic value in _attributes.Values.Where(s => s.Dirty))
                 {
-                    await _mqttClient.SendJsonAsync(value.Topic, value.GetJsonObject(true), token);
+                    await SendValue(value, true, token);
                     attributes++;
                 }
 

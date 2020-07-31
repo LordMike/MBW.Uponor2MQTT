@@ -1,9 +1,10 @@
 ﻿using System;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
+using MBW.HassMQTT.Interfaces;
 
 namespace MBW.HassMQTT
 {
-    public class MqttValueTopic
+    public class MqttStateValueTopic : IMqttValueContainer
     {
         private object _value;
         public string Topic { get; }
@@ -17,18 +18,16 @@ namespace MBW.HassMQTT
                 if (ComparisonHelper.IsSameValue(value, Value))
                     return;
 
-                // TODO: _logger.Verbose("Setting value {value}, for {topic}", newValue, _topic);
-
-                Value = value;
+                _value = value;
                 Dirty = true;
             }
         }
 
-        public MqttValueTopic(string topic)
+        public MqttStateValueTopic(string topic)
         {
             Topic = topic;
         }
-        
+
         private static bool TryConvertStateValue(object val, out string str)
         {
             switch (val)
@@ -45,7 +44,7 @@ namespace MBW.HassMQTT
             }
         }
 
-        public object GetValue(bool resetDirty)
+        public object GetSerializedValue(bool resetDirty)
         {
             if (resetDirty)
                 Dirty = false;

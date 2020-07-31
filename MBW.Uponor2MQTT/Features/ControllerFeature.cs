@@ -24,7 +24,7 @@ namespace MBW.Uponor2MQTT.Features
                     continue;
 
                 string deviceId = IdBuilder.GetControllerId(controller);
-                MqttValueTopic sensor = HassMqttManager.GetEntityStateValue(deviceId, "controller", "state");
+                MqttStateValueTopic sensor = HassMqttManager.GetEntityStateValue(deviceId, "controller", "state");
                 MqttAttributesTopic attributes = HassMqttManager.GetAttributesValue(deviceId, "controller");
 
                 sensor.Value = "discovered";

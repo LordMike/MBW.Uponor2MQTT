@@ -1,4 +1,5 @@
 ﻿using MBW.HassMQTT.DiscoveryModels.Helpers;
+using MBW.HassMQTT.Interfaces;
 using Newtonsoft.Json.Linq;
 
 namespace MBW.HassMQTT.DiscoveryModels
@@ -7,11 +8,12 @@ namespace MBW.HassMQTT.DiscoveryModels
     /// All MQTT discovery types are documented here:
     /// https://www.home-assistant.io/docs/mqtt/discovery/
     /// </summary>
-    public abstract class MqttSensorDiscoveryBase
+    public abstract class MqttSensorDiscoveryBase : IMqttValueContainer
     {
         private readonly JObject _discover;
 
         public bool Dirty { get; private set; }
+
         public string Topic { get; }
 
         public MqttDeviceDocument Device { get; }
@@ -35,12 +37,12 @@ namespace MBW.HassMQTT.DiscoveryModels
             UniqueId = uniqueId;
         }
 
-        public JObject GetJsonObject(bool resetDirty)
+        public object GetSerializedValue(bool resetDirty)
         {
             if (resetDirty)
                 Dirty = false;
 
-            return (JObject)_discover.DeepClone();
+            return _discover;
         }
 
         protected void SetValue<T>(string name, T value)

@@ -49,7 +49,7 @@ namespace MBW.Uponor2MQTT.Service
         private async Task UponorClientOnOnSuccessfulResponse()
         {
             MqttAttributesTopic attributes = _hassMqttManager.GetAttributesValue(DeviceId, EntityId);
-            MqttValueTopic state = _hassMqttManager.GetSystemValue(EntityId);
+            MqttStateValueTopic state = _hassMqttManager.GetSystemValue(EntityId);
 
             state.Value = OkMessage;
             attributes.SetAttribute("last_ok", DateTime.UtcNow.ToString("O"));
@@ -60,7 +60,7 @@ namespace MBW.Uponor2MQTT.Service
         private async Task UponorClientOnOnFailedResponse(string message)
         {
             MqttAttributesTopic attributes = _hassMqttManager.GetAttributesValue(DeviceId, EntityId);
-            MqttValueTopic state = _hassMqttManager.GetSystemValue(EntityId);
+            MqttStateValueTopic state = _hassMqttManager.GetSystemValue(EntityId);
 
             state.Value = ProblemMessage;
             attributes.SetAttribute("last_bad", DateTime.UtcNow.ToString("O"));
