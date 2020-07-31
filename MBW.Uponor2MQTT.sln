@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.dockerignore = .dockerignore
 		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -16,9 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MBW.HassMQTT", "MBW.HassMQT
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MBW.HassMQTT.DiscoveryModels", "MBW.HassMQTT.DiscoveryModels\MBW.HassMQTT.DiscoveryModels.csproj", "{74C7154F-8BC0-483E-BB8B-2DE45E4B2C65}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MBW.UponorApi", "MBW.UponorApi\MBW.UponorApi.csproj", "{A63C4247-C6CF-4C49-A5AC-8D7760797B09}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MBW.UponorApi", "MBW.UponorApi\MBW.UponorApi.csproj", "{A63C4247-C6CF-4C49-A5AC-8D7760797B09}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MBW.HassMQTT.Abstracts", "MBW.HassMQTT.Abstracts\MBW.HassMQTT.Abstracts.csproj", "{E9C5BE1F-93D3-4A76-A174-FE3E99718209}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MBW.HassMQTT.Abstracts", "MBW.HassMQTT.Abstracts\MBW.HassMQTT.Abstracts.csproj", "{E9C5BE1F-93D3-4A76-A174-FE3E99718209}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

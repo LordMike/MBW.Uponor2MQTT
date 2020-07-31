@@ -1,10 +1,12 @@
 ﻿using System;
 
+#nullable enable
+
 namespace MBW.Uponor2MQTT.Helpers
 {
     internal static class ComparisonHelper
     {
-        public static bool IsSameValue(object a, object b)
+        public static bool IsSameValue(object? a, object? b)
         {
             if (ReferenceEquals(a, b))
                 return true;

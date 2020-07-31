@@ -46,7 +46,7 @@ namespace MBW.Uponor2MQTT.Service
             _attributesTopic = topicBuilder.GetAttributesTopic(DeviceId, EntityId);
         }
 
-        private async Task UponorClientOnOnSuccessfulResponse()
+        private Task UponorClientOnOnSuccessfulResponse()
         {
             MqttAttributesTopic attributes = _hassMqttManager.GetAttributesValue(DeviceId, EntityId);
             MqttStateValueTopic state = _hassMqttManager.GetSystemValue(EntityId);
@@ -55,9 +55,11 @@ namespace MBW.Uponor2MQTT.Service
             attributes.SetAttribute("last_ok", DateTime.UtcNow.ToString("O"));
 
             _shouldFlush.Set();
+
+            return Task.CompletedTask;
         }
 
-        private async Task UponorClientOnOnFailedResponse(string message)
+        private Task UponorClientOnOnFailedResponse(string message)
         {
             MqttAttributesTopic attributes = _hassMqttManager.GetAttributesValue(DeviceId, EntityId);
             MqttStateValueTopic state = _hassMqttManager.GetSystemValue(EntityId);
@@ -67,6 +69,8 @@ namespace MBW.Uponor2MQTT.Service
             attributes.SetAttribute("last_bad_status", message);
 
             _shouldFlush.Set();
+
+            return Task.CompletedTask;
         }
 
         private async Task FlushingTask(CancellationToken cancellationToken)

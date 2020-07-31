@@ -7,7 +7,7 @@ namespace MBW.HassMQTT
     public class MqttStateValueTopic : IMqttValueContainer
     {
         private object _value;
-        public string Topic { get; }
+        public string PublishTopic { get; }
         public bool Dirty { get; private set; }
 
         public object Value
@@ -25,7 +25,7 @@ namespace MBW.HassMQTT
 
         public MqttStateValueTopic(string topic)
         {
-            Topic = topic;
+            PublishTopic = topic;
         }
 
         private static bool TryConvertStateValue(object val, out string str)

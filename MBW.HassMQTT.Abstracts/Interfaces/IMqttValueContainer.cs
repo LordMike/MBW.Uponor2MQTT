@@ -2,7 +2,7 @@
 {
     public interface IMqttValueContainer
     {
-        string Topic { get; }
+        string PublishTopic { get; }
         bool Dirty { get; }
 
         object GetSerializedValue(bool resetDirty);

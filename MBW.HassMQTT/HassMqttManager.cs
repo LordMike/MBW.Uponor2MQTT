@@ -86,9 +86,9 @@ namespace MBW.HassMQTT
             var value = container.GetSerializedValue(resetDirty);
 
             if (value is string str)
-                await _mqttClient.SendValueAsync(container.Topic, str, token);
+                await _mqttClient.SendValueAsync(container.PublishTopic, str, token);
             else
-                await _mqttClient.SendJsonAsync(container.Topic, JToken.FromObject(value), token);
+                await _mqttClient.SendJsonAsync(container.PublishTopic, JToken.FromObject(value), token);
         }
 
         public async Task FlushAll(CancellationToken token = default)

@@ -6,14 +6,14 @@ namespace MBW.HassMQTT
 {
     public class MqttAttributesTopic : IMqttValueContainer
     {
-        public string Topic { get; }
+        public string PublishTopic { get; }
         public bool Dirty { get; private set; }
 
         private readonly Dictionary<string, object> _attributes;
 
         public MqttAttributesTopic(string topic)
         {
-            Topic = topic;
+            PublishTopic = topic;
             _attributes = new Dictionary<string, object>();
         }
 

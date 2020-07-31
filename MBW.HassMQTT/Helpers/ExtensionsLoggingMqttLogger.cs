@@ -7,11 +7,13 @@ namespace MBW.HassMQTT.Helpers
     /// <summary>
     /// Logging class to map between <see cref="IMqttNetLogger"/>, <see cref="IMqttNetScopedLogger"/> and <see cref="ILogger"/>
     /// </summary>
-    class ExtensionsLoggingMqttLogger : IMqttNetLogger, IMqttNetScopedLogger
+    public class ExtensionsLoggingMqttLogger : IMqttNetLogger, IMqttNetScopedLogger
     {
         private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger _logger;
         private readonly string _source;
+
+        public event EventHandler<MqttNetLogMessagePublishedEventArgs> LogMessagePublished;
 
         public ExtensionsLoggingMqttLogger(ILoggerFactory loggerFactory, string source)
         {
@@ -53,7 +55,5 @@ namespace MBW.HassMQTT.Helpers
 
             _logger.Log(level, exception, message, parameters);
         }
-
-        public event EventHandler<MqttNetLogMessagePublishedEventArgs> LogMessagePublished;
     }
 }

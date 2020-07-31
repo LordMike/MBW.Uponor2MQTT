@@ -14,7 +14,7 @@ namespace MBW.HassMQTT.DiscoveryModels
 
         public bool Dirty { get; private set; }
 
-        public string Topic { get; }
+        public string PublishTopic { get; }
 
         public MqttDeviceDocument Device { get; }
 
@@ -26,7 +26,7 @@ namespace MBW.HassMQTT.DiscoveryModels
 
         public MqttSensorDiscoveryBase(string topic, string uniqueId)
         {
-            Topic = topic;
+            PublishTopic = topic;
             _discover = new JObject();
 
             JObject deviceDoc = new JObject();
