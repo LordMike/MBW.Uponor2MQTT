@@ -1,6 +1,5 @@
 ﻿using System;
 using MBW.HassMQTT;
-using MBW.HassMQTT.Mqtt;
 using MBW.Uponor2MQTT.HASS;
 using MBW.UponorApi;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,16 +8,13 @@ namespace MBW.Uponor2MQTT.Features
 {
     internal abstract class FeatureBase
     {
-        protected SensorStore SensorStore { get; }
-
-        protected HassTopicBuilder TopicBuilder { get; }
+        protected HassMqttManager HassMqttManager { get; }
 
         protected HassUniqueIdBuilder IdBuilder { get; }
 
         public FeatureBase(IServiceProvider serviceProvider)
         {
-            SensorStore = serviceProvider.GetRequiredService<SensorStore>();
-            TopicBuilder = serviceProvider.GetRequiredService<HassTopicBuilder>();
+            HassMqttManager = serviceProvider.GetRequiredService<HassMqttManager>();
             IdBuilder = serviceProvider.GetRequiredService<HassUniqueIdBuilder>();
         }
 

@@ -24,11 +24,8 @@ namespace MBW.Uponor2MQTT.Features
                     continue;
 
                 string deviceId = IdBuilder.GetControllerId(controller);
-                string stateTopic = TopicBuilder.GetEntityTopic(deviceId, "controller", "state");
-                string attributesTopic = TopicBuilder.GetAttributesTopic(deviceId, "controller");
-
-                MqttValueTopic sensor = SensorStore.GetStateValue(stateTopic);
-                MqttAttributesTopic attributes = SensorStore.GetAttributesValue(attributesTopic);
+                MqttValueTopic sensor = HassMqttManager.GetEntityStateValue(deviceId, "controller", "state");
+                MqttAttributesTopic attributes = HassMqttManager.GetAttributesValue(deviceId, "controller");
 
                 sensor.Value = "discovered";
                 attributes.SetAttribute("sw_version", val);

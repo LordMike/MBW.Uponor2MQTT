@@ -18,7 +18,7 @@ namespace MBW.Uponor2MQTT.Service
         private readonly ILogger<HassAliveAndWillService> _logger;
         private readonly IMqttClient _mqttClient;
         private readonly MqttEvents _mqttEvents;
-        private readonly SensorStore _sensorStore;
+        private readonly HassMqttManager _hassMqttManager;
 
         public const string OkMessage = "ok";
         public const string ProblemMessage = "problem";
@@ -32,13 +32,13 @@ namespace MBW.Uponor2MQTT.Service
 
         public HassAliveAndWillService(ILogger<HassAliveAndWillService> logger,
             IMqttClient mqttClient, MqttEvents mqttEvents,
-            SensorStore sensorStore,
-            HassTopicBuilder topicBuilder)
+            HassMqttManager hassMqttManager,
+            HassMqttTopicBuilder topicBuilder)
         {
             _logger = logger;
             _mqttClient = mqttClient;
             _mqttEvents = mqttEvents;
-            _sensorStore = sensorStore;
+            _hassMqttManager = hassMqttManager;
 
             _version = typeof(Program).Assembly.GetName().Version.ToString(3);
 
@@ -48,7 +48,7 @@ namespace MBW.Uponor2MQTT.Service
 
         private void CreateSystemEntities()
         {
-            MqttBinarySensor sensor = _sensorStore.Configure<MqttBinarySensor>(DeviceId, EntityId);
+            MqttBinarySensor sensor = _hassMqttManager.ConfigureDiscovery<MqttBinarySensor>(DeviceId, EntityId);
 
             sensor.Device.Name = "Uponor2MQTT";
             sensor.Device.Identifiers = new[] { DeviceId };
@@ -69,7 +69,7 @@ namespace MBW.Uponor2MQTT.Service
             CreateSystemEntities();
 
             // Push starting values
-            MqttAttributesTopic attributes = _sensorStore.GetAttributesValue(_attributesTopic);
+            MqttAttributesTopic attributes = _hassMqttManager.GetAttributesValue(DeviceId, EntityId);
 
             attributes.SetAttribute("version", _version);
             attributes.SetAttribute("started", DateTime.UtcNow);

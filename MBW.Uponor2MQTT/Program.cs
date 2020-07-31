@@ -109,7 +109,7 @@ namespace MBW.Uponor2MQTT
                 .AddSingleton<IMqttClientOptions>(provider =>
                 {
                     MqttConfiguration mqttConfig = provider.GetOptions<MqttConfiguration>();
-                    HassTopicBuilder topicBuilder = provider.GetRequiredService<HassTopicBuilder>();
+                    HassMqttTopicBuilder topicBuilder = provider.GetRequiredService<HassMqttTopicBuilder>();
 
                     // Prepare options
                     MqttClientOptionsBuilder optionsBuilder = new MqttClientOptionsBuilder()
@@ -167,7 +167,7 @@ namespace MBW.Uponor2MQTT
                 .Configure<HassConfiguration>(context.Configuration.GetSection("HASS"))
                 .Configure<UponorConfiguration>(context.Configuration.GetSection("Uponor"))
                 .Configure<ProxyConfiguration>(context.Configuration.GetSection("Proxy"))
-                .AddSingleton(x => new HassTopicBuilder(x.GetOptions<HassConfiguration>()))
+                .AddSingleton(x => new HassMqttTopicBuilder(x.GetOptions<HassConfiguration>()))
                 .AddSingleton<HassUniqueIdBuilder>()
                 .AddHostedService<UponorConnectedService>()
                 .AddHttpClient("uponor")
@@ -191,7 +191,7 @@ namespace MBW.Uponor2MQTT
                 provider.GetRequiredService<IHttpClientFactory>().CreateClient("uponor")));
 
             services
-                .AddSingleton<SensorStore>()
+                .AddSingleton<HassMqttManager>()
                 .AddSingleton<FeatureManager>()
                 .AddSingleton<FeatureBase, ControllerFeature>()
                 .AddSingleton<FeatureBase, UhomeFeature>()

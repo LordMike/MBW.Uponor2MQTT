@@ -19,7 +19,7 @@ namespace MBW.Uponor2MQTT.Service
         private readonly ILogger<UponorSystemService> _logger;
         private readonly FeatureManager _featureManager;
         private readonly UhomeUponorClient _uponorClient;
-        private readonly SensorStore _sensorStore;
+        private readonly HassMqttManager _hassMqttManager;
         private readonly IMqttClient _mqttClient;
         private readonly SystemDetailsContainer _detailsContainer;
         private readonly UponorConfiguration _config;
@@ -29,14 +29,14 @@ namespace MBW.Uponor2MQTT.Service
             IOptions<UponorConfiguration> config,
             FeatureManager featureManager,
             UhomeUponorClient uponorClient,
-            SensorStore sensorStore,
+            HassMqttManager hassMqttManager,
             IMqttClient mqttClient,
             SystemDetailsContainer detailsContainer)
         {
             _logger = logger;
             _featureManager = featureManager;
             _uponorClient = uponorClient;
-            _sensorStore = sensorStore;
+            _hassMqttManager = hassMqttManager;
             _mqttClient = mqttClient;
             _detailsContainer = detailsContainer;
             _config = config.Value;
@@ -80,7 +80,7 @@ namespace MBW.Uponor2MQTT.Service
                 
                 try
                 {
-                    await _sensorStore.FlushAll(_mqttClient, stoppingToken);
+                    await _hassMqttManager.FlushAll(_mqttClient, stoppingToken);
                 }
                 catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
                 {

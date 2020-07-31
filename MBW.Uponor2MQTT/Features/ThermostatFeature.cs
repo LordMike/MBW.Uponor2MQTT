@@ -21,8 +21,7 @@ namespace MBW.Uponor2MQTT.Features
                 string deviceId = IdBuilder.GetThermostatId(controller, thermostat);
 
                 // Temperature
-                string topic = TopicBuilder.GetEntityTopic(deviceId, "temp", "state");
-                MqttValueTopic sensor = SensorStore.GetStateValue(topic);
+                MqttValueTopic sensor = HassMqttManager.GetEntityStateValue(deviceId, "temp", "state");
 
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.RoomTemperature, controller, thermostat),
@@ -32,8 +31,7 @@ namespace MBW.Uponor2MQTT.Features
                 }
 
                 // Setpoint
-                topic = TopicBuilder.GetEntityTopic(deviceId, "temp", "setpoint");
-                sensor = SensorStore.GetStateValue(topic);
+                sensor = HassMqttManager.GetEntityStateValue(deviceId, "temp", "setpoint");
 
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.RoomSetpoint, controller, thermostat),
@@ -43,11 +41,8 @@ namespace MBW.Uponor2MQTT.Features
                 }
 
                 // Action & Mode
-                topic = TopicBuilder.GetEntityTopic(deviceId, "temp", "action");
-                sensor = SensorStore.GetStateValue(topic);
-
-                topic = TopicBuilder.GetEntityTopic(deviceId, "temp", "mode");
-                var modeSensor = SensorStore.GetStateValue(topic);
+                sensor = HassMqttManager.GetEntityStateValue(deviceId, "temp", "action");
+                var modeSensor = HassMqttManager.GetEntityStateValue(deviceId, "temp", "mode");
 
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.RoomInDemand, controller, thermostat),
@@ -80,8 +75,7 @@ namespace MBW.Uponor2MQTT.Features
                 }
 
                 // Home/away
-                topic = TopicBuilder.GetEntityTopic(deviceId, "temp", "awaymode");
-                sensor = SensorStore.GetStateValue(topic);
+                sensor = HassMqttManager.GetEntityStateValue(deviceId, "temp", "awaymode");
 
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.HomeAwayModeStatus, controller, thermostat),

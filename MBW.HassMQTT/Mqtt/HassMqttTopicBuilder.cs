@@ -1,18 +1,15 @@
 ﻿using System.Linq;
 using System.Text;
-using EnumsNET;
-using MBW.HassMQTT.DiscoveryModels;
-using MBW.HassMQTT.DiscoveryModels.Helpers;
 
 namespace MBW.HassMQTT.Mqtt
 {
-    public class HassTopicBuilder
+    public class HassMqttTopicBuilder
     {
         private const char Seperator = '/';
         private readonly string _discoveryPrefix;
         private readonly string _servicePrefix;
 
-        public HassTopicBuilder(HassConfiguration hassOptions)
+        public HassMqttTopicBuilder(HassConfiguration hassOptions)
         {
             _discoveryPrefix = hassOptions.HomeassistantDiscoveryPrefix.TrimEnd('/');
             _servicePrefix = hassOptions.TopicPrefix.TrimEnd('/');
@@ -41,24 +38,6 @@ namespace MBW.HassMQTT.Mqtt
         public string GetServiceTopic(params string[] segments)
         {
             return Combine(_servicePrefix, segments);
-        }
-
-        public string GetDiscoveryTopic<TEntity>(string deviceId, string entityId) where TEntity : MqttSensorDiscoveryBase
-        {
-            // homeassistant/<sensor>/<my_device>/<my_entity>/config
-            return GetDiscoveryTopic(DiscoveryHelper.GetDeviceType<TEntity>().AsString(EnumFormat.EnumMemberValue), deviceId, entityId, "config");
-        }
-
-        public string GetAttributesTopic(string deviceId, string entityId)
-        {
-            // <prefix>/<my_device>/<my_entity>/attributes
-            return GetServiceTopic(deviceId, entityId, "attributes");
-        }
-
-        public string GetEntityTopic(string deviceId, string entityId, string kind)
-        {
-            // <prefix>/<my_device>/<my_entity>/<kind>
-            return GetServiceTopic(deviceId, entityId, kind);
         }
     }
 }

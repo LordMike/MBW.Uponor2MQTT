@@ -24,7 +24,7 @@ namespace MBW.Uponor2MQTT.Service
         private readonly ILogger<MqttCommandService> _logger;
         private readonly FeatureManager _featureManager;
         private readonly UhomeUponorClient _uponorClient;
-        private readonly SensorStore _sensorStore;
+        private readonly HassMqttManager _hassMqttManager;
         private readonly IMqttClient _mqttClient;
         private readonly SystemDetailsContainer _detailsContainer;
         private readonly UponorConfiguration _config;
@@ -39,7 +39,7 @@ namespace MBW.Uponor2MQTT.Service
             IServiceProvider serviceProvider,
             FeatureManager featureManager,
             UhomeUponorClient uponorClient,
-            SensorStore sensorStore,
+            HassMqttManager hassMqttManager,
             IMqttClient mqttClient,
             SystemDetailsContainer detailsContainer,
             IEnumerable<ICommandHandler> handlers)
@@ -47,7 +47,7 @@ namespace MBW.Uponor2MQTT.Service
             _logger = logger;
             _featureManager = featureManager;
             _uponorClient = uponorClient;
-            _sensorStore = sensorStore;
+            _hassMqttManager = hassMqttManager;
             _mqttClient = mqttClient;
             _detailsContainer = detailsContainer;
             _config = config.Value;

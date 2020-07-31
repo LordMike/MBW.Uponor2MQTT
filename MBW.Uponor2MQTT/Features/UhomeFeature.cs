@@ -14,11 +14,8 @@ namespace MBW.Uponor2MQTT.Features
         {
             string uniqueId = IdBuilder.GetUhomeId();
 
-            string attributesTopic = TopicBuilder.GetAttributesTopic(uniqueId, "uhome");
-            string stateTopic = TopicBuilder.GetEntityTopic(uniqueId, "uhome", "state");
-
-            attributes = SensorStore.GetAttributesValue(attributesTopic);
-            state = SensorStore.GetStateValue(stateTopic);
+            attributes = HassMqttManager.GetAttributesValue(uniqueId, "uhome");
+            state = HassMqttManager.GetEntityStateValue(uniqueId, "uhome", "state");
         }
 
         public override void Process(UponorResponseContainer values)

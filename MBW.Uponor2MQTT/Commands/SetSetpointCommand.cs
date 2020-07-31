@@ -18,17 +18,17 @@ namespace MBW.Uponor2MQTT.Commands
         private readonly IMqttClient _mqqClient;
         private readonly UhomeUponorClient _client;
         private readonly FeatureManager _featureManager;
-        private readonly SensorStore _sensorStore;
+        private readonly HassMqttManager _hassMqttManager;
         private readonly CultureInfo _parsingCulture = CultureInfo.InvariantCulture;
         private readonly Regex _thermostatRegex = new Regex(@"^uponor_c(?<controller>[0-9]+)_t(?<thermostat>[0-9]+)$", RegexOptions.Compiled);
 
-        public SetSetpointCommand(ILogger<SetSetpointCommand> logger, IMqttClient mqqClient, UhomeUponorClient client, FeatureManager featureManager, SensorStore sensorStore)
+        public SetSetpointCommand(ILogger<SetSetpointCommand> logger, IMqttClient mqqClient, UhomeUponorClient client, FeatureManager featureManager, HassMqttManager hassMqttManager)
         {
             _logger = logger;
             _mqqClient = mqqClient;
             _client = client;
             _featureManager = featureManager;
-            _sensorStore = sensorStore;
+            _hassMqttManager = hassMqttManager;
         }
 
         public string[] GetFilter()
@@ -56,7 +56,7 @@ namespace MBW.Uponor2MQTT.Commands
             UponorResponseContainer newValues = await _client.ReadValue(obj, UponorProperties.Value, token);
 
             _featureManager.Process(newValues);
-            await _sensorStore.FlushAll(_mqqClient, token);
+            await _hassMqttManager.FlushAll(_mqqClient, token);
         }
     }
 }

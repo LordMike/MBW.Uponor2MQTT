@@ -7,7 +7,7 @@ namespace MBW.Uponor2MQTT.Helpers
 {
     internal static class DiscoveryHelpers
     {
-        public static void ApplyAvailabilityInformation(MqttEntitySensorDiscoveryBase discovery, HassTopicBuilder topicBuilder)
+        public static void ApplyAvailabilityInformation(MqttEntitySensorDiscoveryBase discovery, HassMqttTopicBuilder topicBuilder)
         {
             discovery.AvailabilityTopic = topicBuilder.GetSystemTopic("status");;
             discovery.PayloadAvailable = HassAliveAndWillService.OkMessage;
