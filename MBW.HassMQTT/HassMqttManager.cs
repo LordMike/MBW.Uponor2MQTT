@@ -96,7 +96,7 @@ namespace MBW.HassMQTT
             return _attributes[topic] = new MqttAttributesTopic(topic);
         }
 
-        public async Task FlushAll(IMqttClient mqttClient1, CancellationToken token = default)
+        public async Task FlushAll(CancellationToken token = default)
         {
             if (!_lockObject.Wait(0))
             {

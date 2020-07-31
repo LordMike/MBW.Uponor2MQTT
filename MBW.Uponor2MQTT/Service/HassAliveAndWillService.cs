@@ -4,18 +4,16 @@ using System.Threading.Tasks;
 using MBW.HassMQTT;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Models;
+using MBW.HassMQTT.Helpers;
 using MBW.HassMQTT.Mqtt;
 using MBW.Uponor2MQTT.HASS;
-using MBW.Uponor2MQTT.Helpers;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using MQTTnet.Client;
 
 namespace MBW.Uponor2MQTT.Service
 {
     internal class HassAliveAndWillService : BackgroundService
     {
-        private readonly ILogger<HassAliveAndWillService> _logger;
         private readonly IMqttClient _mqttClient;
         private readonly MqttEvents _mqttEvents;
         private readonly HassMqttManager _hassMqttManager;
@@ -30,12 +28,11 @@ namespace MBW.Uponor2MQTT.Service
         private readonly string _stateTopic;
         private readonly string _attributesTopic;
 
-        public HassAliveAndWillService(ILogger<HassAliveAndWillService> logger,
-            IMqttClient mqttClient, MqttEvents mqttEvents,
+        public HassAliveAndWillService(IMqttClient mqttClient,
+            MqttEvents mqttEvents,
             HassMqttManager hassMqttManager,
             HassMqttTopicBuilder topicBuilder)
         {
-            _logger = logger;
             _mqttClient = mqttClient;
             _mqttEvents = mqttEvents;
             _hassMqttManager = hassMqttManager;

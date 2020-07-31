@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using MBW.UponorApi.Configuration;
 using MBW.UponorApi.Enums;
 using MBW.UponorApi.Objects;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
@@ -21,18 +20,16 @@ namespace MBW.UponorApi
 
         private readonly HttpClient _httpClient;
         private readonly UponorConfiguration _configuration;
-        private readonly ILogger<UhomeUponorClient> _logger;
 
         private int _nextRequestInteger = 1;
 
         public event Func<Task> OnSuccessfulResponse;
         public event Func<string, Task> OnFailedResponse;
 
-        public UhomeUponorClient(HttpClient httpClient, IOptions<UponorConfiguration> configuration, ILogger<UhomeUponorClient> logger)
+        public UhomeUponorClient(HttpClient httpClient, IOptions<UponorConfiguration> configuration)
         {
             _httpClient = httpClient;
             _configuration = configuration.Value;
-            _logger = logger;
 
             _httpClient.BaseAddress = _configuration.Host;
         }

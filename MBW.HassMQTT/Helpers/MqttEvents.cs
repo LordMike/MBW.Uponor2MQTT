@@ -6,7 +6,7 @@ using MQTTnet.Client.Disconnecting;
 
 namespace MBW.HassMQTT.Helpers
 {
-    internal class MqttEvents
+    public class MqttEvents
     {
         public event Func<MqttClientConnectedEventArgs, CancellationToken, Task> OnConnect;
         public event Func<MqttClientDisconnectedEventArgs, CancellationToken, Task> OnDisconnect;

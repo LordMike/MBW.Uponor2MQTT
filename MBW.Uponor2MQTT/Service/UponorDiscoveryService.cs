@@ -16,7 +16,6 @@ using MBW.UponorApi.Enums;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MQTTnet.Client;
 using HassDeviceClass = MBW.HassMQTT.DiscoveryModels.Enum.HassDeviceClass;
 
 namespace MBW.Uponor2MQTT.Service
@@ -31,7 +30,6 @@ namespace MBW.Uponor2MQTT.Service
         private readonly HassMqttTopicBuilder _topicBuilder;
         private readonly HassUniqueIdBuilder _uniqueIdBuilder;
         private readonly FeatureManager _featureManager;
-        private readonly IMqttClient _mqttClient;
         private readonly SystemDetailsContainer _detailsContainer;
         private readonly HassMqttManager _hassMqttManager;
         private readonly UponorConfiguration _config;
@@ -40,7 +38,6 @@ namespace MBW.Uponor2MQTT.Service
             ILogger<UponorDiscoveryService> logger,
             IOptions<UponorConfiguration> config,
             FeatureManager featureManager,
-            IMqttClient mqttClient,
             UhomeUponorClient uponorClient,
             HassMqttTopicBuilder topicBuilder,
             HassUniqueIdBuilder uniqueIdBuilder,
@@ -52,7 +49,6 @@ namespace MBW.Uponor2MQTT.Service
             _topicBuilder = topicBuilder;
             _uniqueIdBuilder = uniqueIdBuilder;
             _featureManager = featureManager;
-            _mqttClient = mqttClient;
             _detailsContainer = detailsContainer;
             _hassMqttManager = hassMqttManager;
             _config = config.Value;
@@ -100,7 +96,7 @@ namespace MBW.Uponor2MQTT.Service
 
                 try
                 {
-                    await _hassMqttManager.FlushAll(_mqttClient, stoppingToken);
+                    await _hassMqttManager.FlushAll(stoppingToken);
                 }
                 catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
                 {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using MBW.HassMQTT.Helpers;
 using MBW.Uponor2MQTT.Configuration;
-using MBW.Uponor2MQTT.Helpers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

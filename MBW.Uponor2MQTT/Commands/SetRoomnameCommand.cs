@@ -7,23 +7,20 @@ using MBW.UponorApi;
 using MBW.UponorApi.Enums;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
-using MQTTnet.Client;
 
 namespace MBW.Uponor2MQTT.Commands
 {
     internal class SetRoomnameCommand : ICommandHandler
     {
         private readonly ILogger<SetRoomnameCommand> _logger;
-        private readonly IMqttClient _mqqClient;
         private readonly UhomeUponorClient _client;
         private readonly FeatureManager _featureManager;
         private readonly HassMqttManager _hassMqttManager;
         private readonly Regex _thermostatRegex = new Regex(@"^uponor_c(?<controller>[0-9]+)_t(?<thermostat>[0-9]+)$", RegexOptions.Compiled);
 
-        public SetRoomnameCommand(ILogger<SetRoomnameCommand> logger, IMqttClient mqqClient, UhomeUponorClient client, FeatureManager featureManager, HassMqttManager hassMqttManager)
+        public SetRoomnameCommand(ILogger<SetRoomnameCommand> logger, UhomeUponorClient client, FeatureManager featureManager, HassMqttManager hassMqttManager)
         {
             _logger = logger;
-            _mqqClient = mqqClient;
             _client = client;
             _featureManager = featureManager;
             _hassMqttManager = hassMqttManager;
@@ -53,7 +50,7 @@ namespace MBW.Uponor2MQTT.Commands
             UponorResponseContainer newValues = await _client.ReadValue(obj, UponorProperties.Value, token);
 
             _featureManager.Process(newValues);
-            await _hassMqttManager.FlushAll(_mqqClient, token);
+            await _hassMqttManager.FlushAll(token);
         }
     }
 }

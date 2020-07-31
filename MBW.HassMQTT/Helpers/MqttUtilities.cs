@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace MBW.HassMQTT.Helpers
 {
-    internal static class MqttUtilities
+    public static class MqttUtilities
     {
         private static readonly Encoding Encoding = new UTF8Encoding(false);
 

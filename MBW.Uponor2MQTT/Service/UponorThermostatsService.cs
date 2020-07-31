@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT;
-using MBW.Uponor2MQTT.Configuration;
 using MBW.Uponor2MQTT.Features;
 using MBW.UponorApi;
 using MBW.UponorApi.Configuration;
@@ -12,7 +11,6 @@ using MBW.UponorApi.Enums;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using MQTTnet.Client;
 
 namespace MBW.Uponor2MQTT.Service
 {
@@ -22,7 +20,6 @@ namespace MBW.Uponor2MQTT.Service
         private readonly FeatureManager _featureManager;
         private readonly UhomeUponorClient _uponorClient;
         private readonly HassMqttManager _hassMqttManager;
-        private readonly IMqttClient _mqttClient;
         private readonly SystemDetailsContainer _detailsContainer;
         private readonly UponorConfiguration _config;
 
@@ -32,14 +29,12 @@ namespace MBW.Uponor2MQTT.Service
             FeatureManager featureManager,
             UhomeUponorClient uponorClient,
             HassMqttManager hassMqttManager,
-            IMqttClient mqttClient,
             SystemDetailsContainer detailsContainer)
         {
             _logger = logger;
             _featureManager = featureManager;
             _uponorClient = uponorClient;
             _hassMqttManager = hassMqttManager;
-            _mqttClient = mqttClient;
             _detailsContainer = detailsContainer;
             _config = config.Value;
         }
@@ -82,7 +77,7 @@ namespace MBW.Uponor2MQTT.Service
                 
                 try
                 {
-                    await _hassMqttManager.FlushAll(_mqttClient, stoppingToken);
+                    await _hassMqttManager.FlushAll(stoppingToken);
                 }
                 catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
                 {

@@ -14,10 +14,5 @@ namespace MBW.HassMQTT.DiscoveryModels.Helpers
 
             return ((DeviceTypeAttribute) attribute).DeviceType;
         }
-
-        public static HassDeviceType GetDeviceType<T>(this T entity) where T : MqttSensorDiscoveryBase
-        {
-            return GetDeviceType<T>();
-        }
     }
 }

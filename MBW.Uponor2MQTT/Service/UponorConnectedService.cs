@@ -9,16 +9,12 @@ using MBW.Uponor2MQTT.HASS;
 using MBW.Uponor2MQTT.Helpers;
 using MBW.UponorApi;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using MQTTnet.Client;
 using Nito.AsyncEx;
 
 namespace MBW.Uponor2MQTT.Service
 {
     internal class UponorConnectedService : BackgroundService
     {
-        private readonly ILogger<UponorConnectedService> _logger;
-        private readonly IMqttClient _mqttClient;
         private readonly HassMqttManager _hassMqttManager;
         private readonly UhomeUponorClient _uponorClient;
         private readonly HassMqttTopicBuilder _topicBuilder;
@@ -36,14 +32,10 @@ namespace MBW.Uponor2MQTT.Service
         private readonly TimeSpan _flushInterval = TimeSpan.FromSeconds(5);
         private readonly AsyncAutoResetEvent _shouldFlush = new AsyncAutoResetEvent(false);
 
-        public UponorConnectedService(ILogger<UponorConnectedService> logger,
-            IMqttClient mqttClient,
-            HassMqttManager hassMqttManager,
+        public UponorConnectedService(HassMqttManager hassMqttManager,
             UhomeUponorClient uponorClient,
             HassMqttTopicBuilder topicBuilder)
         {
-            _logger = logger;
-            _mqttClient = mqttClient;
             _hassMqttManager = hassMqttManager;
             _uponorClient = uponorClient;
             _topicBuilder = topicBuilder;
@@ -89,7 +81,7 @@ namespace MBW.Uponor2MQTT.Service
                 await _shouldFlush.WaitAsync(cancellationToken);
 
                 // Flush our values
-                await _hassMqttManager.FlushAll(_mqttClient, cancellationToken);
+                await _hassMqttManager.FlushAll(cancellationToken);
             }
         }
 

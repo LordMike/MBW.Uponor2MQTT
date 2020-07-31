@@ -3,14 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MBW.HassMQTT;
 using MBW.HassMQTT.Mqtt;
 using MBW.Uponor2MQTT.Commands;
-using MBW.Uponor2MQTT.Configuration;
-using MBW.Uponor2MQTT.Features;
 using MBW.Uponor2MQTT.MQTT;
-using MBW.UponorApi;
-using MBW.UponorApi.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -22,35 +17,19 @@ namespace MBW.Uponor2MQTT.Service
     internal class MqttCommandService : IHostedService, IMqttMessageReceiver
     {
         private readonly ILogger<MqttCommandService> _logger;
-        private readonly FeatureManager _featureManager;
-        private readonly UhomeUponorClient _uponorClient;
-        private readonly HassMqttManager _hassMqttManager;
         private readonly IMqttClient _mqttClient;
-        private readonly SystemDetailsContainer _detailsContainer;
-        private readonly UponorConfiguration _config;
         private readonly string _topicPrefix;
 
         private readonly List<(string[] filter, ICommandHandler handler)> _handlers = new List<(string[] filter, ICommandHandler handler)>();
 
         public MqttCommandService(
             ILogger<MqttCommandService> logger,
-            IOptions<UponorConfiguration> config,
             IOptions<HassConfiguration> hassConfig,
-            IServiceProvider serviceProvider,
-            FeatureManager featureManager,
-            UhomeUponorClient uponorClient,
-            HassMqttManager hassMqttManager,
             IMqttClient mqttClient,
-            SystemDetailsContainer detailsContainer,
             IEnumerable<ICommandHandler> handlers)
         {
             _logger = logger;
-            _featureManager = featureManager;
-            _uponorClient = uponorClient;
-            _hassMqttManager = hassMqttManager;
             _mqttClient = mqttClient;
-            _detailsContainer = detailsContainer;
-            _config = config.Value;
             _topicPrefix = hassConfig.Value.TopicPrefix.TrimEnd('/');
 
             foreach (ICommandHandler handler in handlers)
