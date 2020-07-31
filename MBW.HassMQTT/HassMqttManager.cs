@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels;
 using MBW.HassMQTT.Helpers;
-using MBW.HassMQTT.Interfaces;
-using MBW.HassMQTT.Mqtt;
+using MBW.HassMQTT.Topics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Client;
@@ -83,7 +83,7 @@ namespace MBW.HassMQTT
 
         private async Task SendValue(IMqttValueContainer container, bool resetDirty, CancellationToken token)
         {
-            var value = container.GetSerializedValue(resetDirty);
+            object value = container.GetSerializedValue(resetDirty);
 
             if (value is string str)
                 await _mqttClient.SendValueAsync(container.PublishTopic, str, token);

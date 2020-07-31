@@ -3,16 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using MBW.HassMQTT.Mqtt;
-using MBW.Uponor2MQTT.Commands;
-using MBW.Uponor2MQTT.MQTT;
+using MBW.HassMQTT.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MQTTnet;
 using MQTTnet.Client;
 
-namespace MBW.Uponor2MQTT.Service
+namespace MBW.HassMQTT.CommonServices.Commands
 {
     internal class MqttCommandService : IHostedService, IMqttMessageReceiver
     {
@@ -20,19 +18,19 @@ namespace MBW.Uponor2MQTT.Service
         private readonly IMqttClient _mqttClient;
         private readonly string _topicPrefix;
 
-        private readonly List<(string[] filter, ICommandHandler handler)> _handlers = new List<(string[] filter, ICommandHandler handler)>();
+        private readonly List<(string[] filter, IMqttCommandHandler handler)> _handlers = new List<(string[] filter, IMqttCommandHandler handler)>();
 
         public MqttCommandService(
             ILogger<MqttCommandService> logger,
             IOptions<HassConfiguration> hassConfig,
             IMqttClient mqttClient,
-            IEnumerable<ICommandHandler> handlers)
+            IEnumerable<IMqttCommandHandler> handlers)
         {
             _logger = logger;
             _mqttClient = mqttClient;
             _topicPrefix = hassConfig.Value.TopicPrefix.TrimEnd('/');
 
-            foreach (ICommandHandler handler in handlers)
+            foreach (IMqttCommandHandler handler in handlers)
                 _handlers.Add((handler.GetFilter(), handler));
         }
 
@@ -42,7 +40,7 @@ namespace MBW.Uponor2MQTT.Service
             // Take the filters of each command, and built a topic filter from it
             // Null segments mean "+" (placeholder for one segment)
 
-            foreach ((string[] filter, ICommandHandler _) in _handlers)
+            foreach ((string[] filter, IMqttCommandHandler _) in _handlers)
             {
                 string subscription = $"{_topicPrefix}/{string.Join("/", filter.Select(x => x ?? "+"))}";
 
@@ -61,10 +59,10 @@ namespace MBW.Uponor2MQTT.Service
         {
             // Skip prefix, split topic
             string[] topicLevels = argApplicationMessage.Topic.Substring(_topicPrefix.Length + 1).Split('/');
-            
+
             _logger.LogDebug("Received {Topic}, value {Value}", argApplicationMessage.Topic, argApplicationMessage.ConvertPayloadToString());
 
-            foreach ((string[] filter, ICommandHandler handler) in _handlers)
+            foreach ((string[] filter, IMqttCommandHandler handler) in _handlers)
             {
                 if (filter.Length != topicLevels.Length)
                     continue;

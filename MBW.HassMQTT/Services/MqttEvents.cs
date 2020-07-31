@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
 
-namespace MBW.HassMQTT.Helpers
+namespace MBW.HassMQTT.Services
 {
     public class MqttEvents
     {

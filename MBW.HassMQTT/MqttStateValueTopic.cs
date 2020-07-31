@@ -1,6 +1,6 @@
 ﻿using System;
+using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
-using MBW.HassMQTT.Interfaces;
 
 namespace MBW.HassMQTT
 {
@@ -49,7 +49,7 @@ namespace MBW.HassMQTT
             if (resetDirty)
                 Dirty = false;
 
-            if (TryConvertStateValue(Value, out var asString))
+            if (TryConvertStateValue(Value, out string asString))
                 return asString;
 
             return Value;

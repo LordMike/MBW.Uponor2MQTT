@@ -2,7 +2,7 @@
 using MBW.HassMQTT.DiscoveryModels;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
 
-namespace MBW.HassMQTT.Mqtt
+namespace MBW.HassMQTT.Topics
 {
     public static class HassMqttTopicBuilderExtensions
     {

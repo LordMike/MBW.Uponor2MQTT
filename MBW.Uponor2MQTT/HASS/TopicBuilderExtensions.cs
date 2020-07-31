@@ -1,5 +1,5 @@
 ﻿using MBW.HassMQTT;
-using MBW.HassMQTT.Mqtt;
+using MBW.HassMQTT.Topics;
 
 namespace MBW.Uponor2MQTT.HASS
 {

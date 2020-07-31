@@ -2,11 +2,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT;
+using MBW.HassMQTT.CommonServices.AliveAndWill;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Models;
-using MBW.HassMQTT.Mqtt;
+using MBW.HassMQTT.Topics;
 using MBW.Uponor2MQTT.HASS;
-using MBW.Uponor2MQTT.Helpers;
 using MBW.UponorApi;
 using Microsoft.Extensions.Hosting;
 using Nito.AsyncEx;
@@ -17,13 +17,13 @@ namespace MBW.Uponor2MQTT.Service
     {
         private readonly HassMqttManager _hassMqttManager;
         private readonly UhomeUponorClient _uponorClient;
-        private readonly HassMqttTopicBuilder _topicBuilder;
+        private readonly AvailabilityDecoratorService _availabilityDecorator;
 
         public const string OkMessage = "ok";
         public const string ProblemMessage = "problem";
 
         private readonly string _version;
-        private const string DeviceId = "uponor2mqtt";
+        private const string DeviceId = "Uponor2MQTT";
         private const string EntityId = "api_operational";
 
         private readonly string _stateTopic;
@@ -34,11 +34,12 @@ namespace MBW.Uponor2MQTT.Service
 
         public UponorConnectedService(HassMqttManager hassMqttManager,
             UhomeUponorClient uponorClient,
-            HassMqttTopicBuilder topicBuilder)
+            HassMqttTopicBuilder topicBuilder,
+            AvailabilityDecoratorService availabilityDecorator)
         {
             _hassMqttManager = hassMqttManager;
             _uponorClient = uponorClient;
-            _topicBuilder = topicBuilder;
+            _availabilityDecorator = availabilityDecorator;
 
             _version = typeof(Program).Assembly.GetName().Version.ToString(3);
 
@@ -105,8 +106,8 @@ namespace MBW.Uponor2MQTT.Service
 
             sensor.StateTopic = _stateTopic;
             sensor.JsonAttributesTopic = _attributesTopic;
-
-            DiscoveryHelpers.ApplyAvailabilityInformation(sensor, _topicBuilder);
+            
+            _availabilityDecorator.ApplyAvailabilityInformation(sensor);
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)

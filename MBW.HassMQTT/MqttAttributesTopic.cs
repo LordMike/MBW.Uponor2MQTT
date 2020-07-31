@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using MBW.HassMQTT.Abstracts.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Helpers;
-using MBW.HassMQTT.Interfaces;
 
 namespace MBW.HassMQTT
 {
@@ -33,7 +33,7 @@ namespace MBW.HassMQTT
                 return;
             }
 
-            if (_attributes.TryGetValue(name, out var existing) && ComparisonHelper.IsSameValue(existing, value))
+            if (_attributes.TryGetValue(name, out object existing) && ComparisonHelper.IsSameValue(existing, value))
                 return;
 
             _attributes[name] = value;

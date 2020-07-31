@@ -2,9 +2,9 @@
 using System.Threading.Tasks;
 using MQTTnet;
 
-namespace MBW.Uponor2MQTT.MQTT
+namespace MBW.HassMQTT.Services
 {
-    internal interface IMqttMessageReceiver
+    public interface IMqttMessageReceiver
     {
         Task ReceiveAsync(MqttApplicationMessage argApplicationMessage, CancellationToken token = default);
     }

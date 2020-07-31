@@ -1,4 +1,4 @@
-﻿namespace MBW.HassMQTT.Interfaces
+﻿namespace MBW.HassMQTT.Abstracts.Interfaces
 {
     public interface IMqttValueContainer
     {

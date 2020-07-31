@@ -4,12 +4,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT;
+using MBW.HassMQTT.CommonServices.AliveAndWill;
 using MBW.HassMQTT.DiscoveryModels;
 using MBW.HassMQTT.DiscoveryModels.Models;
-using MBW.HassMQTT.Mqtt;
+using MBW.HassMQTT.Topics;
 using MBW.Uponor2MQTT.Features;
 using MBW.Uponor2MQTT.HASS;
-using MBW.Uponor2MQTT.Helpers;
 using MBW.UponorApi;
 using MBW.UponorApi.Configuration;
 using MBW.UponorApi.Enums;
@@ -32,6 +32,7 @@ namespace MBW.Uponor2MQTT.Service
         private readonly FeatureManager _featureManager;
         private readonly SystemDetailsContainer _detailsContainer;
         private readonly HassMqttManager _hassMqttManager;
+        private readonly AvailabilityDecoratorService _availabilityDecorator;
         private readonly UponorConfiguration _config;
 
         public UponorDiscoveryService(
@@ -42,7 +43,8 @@ namespace MBW.Uponor2MQTT.Service
             HassMqttTopicBuilder topicBuilder,
             HassUniqueIdBuilder uniqueIdBuilder,
             SystemDetailsContainer detailsContainer,
-            HassMqttManager hassMqttManager)
+            HassMqttManager hassMqttManager,
+            AvailabilityDecoratorService availabilityDecorator)
         {
             _logger = logger;
             _uponorClient = uponorClient;
@@ -51,6 +53,7 @@ namespace MBW.Uponor2MQTT.Service
             _featureManager = featureManager;
             _detailsContainer = detailsContainer;
             _hassMqttManager = hassMqttManager;
+            _availabilityDecorator = availabilityDecorator;
             _config = config.Value;
         }
 
@@ -186,7 +189,7 @@ namespace MBW.Uponor2MQTT.Service
                 sensor.StateTopic = _topicBuilder.GetEntityTopic(uHomeDeviceId, entityId, "state");
                 sensor.JsonAttributesTopic = _topicBuilder.GetAttributesTopic(uHomeDeviceId, entityId);
 
-                DiscoveryHelpers.ApplyAvailabilityInformation(sensor, _topicBuilder);
+                _availabilityDecorator.ApplyAvailabilityInformation(sensor);
             }
 
             // Controllers
@@ -204,8 +207,8 @@ namespace MBW.Uponor2MQTT.Service
 
                 sensor.StateTopic = _topicBuilder.GetEntityTopic(deviceId, entityId, "state");
                 sensor.JsonAttributesTopic = _topicBuilder.GetAttributesTopic(deviceId, entityId);
-
-                DiscoveryHelpers.ApplyAvailabilityInformation(sensor, _topicBuilder);
+                
+                _availabilityDecorator.ApplyAvailabilityInformation(sensor);
             }
 
             // Thermostats
@@ -231,7 +234,7 @@ namespace MBW.Uponor2MQTT.Service
                 // Climate
                 MqttClimate climate = _hassMqttManager.ConfigureDiscovery<MqttClimate>(deviceId, "temp");
                 SetThermostatDeviceInfo(climate.Device, deviceName, deviceId, controllerId);
-                DiscoveryHelpers.ApplyAvailabilityInformation(climate, _topicBuilder);
+                _availabilityDecorator.ApplyAvailabilityInformation(climate);
 
                 climate.Name = $"{deviceName} Thermostat";
 
@@ -260,7 +263,7 @@ namespace MBW.Uponor2MQTT.Service
                 // Humidity
                 MqttSensor sensor = _hassMqttManager.ConfigureDiscovery<MqttSensor>(deviceId, "humidity");
                 SetThermostatDeviceInfo(sensor.Device, deviceName, deviceId, controllerId);
-                DiscoveryHelpers.ApplyAvailabilityInformation(sensor, _topicBuilder);
+                _availabilityDecorator.ApplyAvailabilityInformation(sensor);
 
                 sensor.Name = $"{deviceName} Humidity";
                 sensor.DeviceClass = HassDeviceClass.Humidity;
@@ -273,7 +276,7 @@ namespace MBW.Uponor2MQTT.Service
                 // Battery sensor
                 sensor = _hassMqttManager.ConfigureDiscovery<MqttSensor>(deviceId, "battery");
                 SetThermostatDeviceInfo(sensor.Device, deviceName, deviceId, controllerId);
-                DiscoveryHelpers.ApplyAvailabilityInformation(sensor, _topicBuilder);
+                _availabilityDecorator.ApplyAvailabilityInformation(sensor);
 
                 sensor.Name = $"{deviceName} Battery";
                 sensor.DeviceClass = HassDeviceClass.Battery;
@@ -286,7 +289,7 @@ namespace MBW.Uponor2MQTT.Service
                 // Alarm sensor
                 MqttBinarySensor binarySensor = _hassMqttManager.ConfigureDiscovery<MqttBinarySensor>(deviceId, "alarms");
                 SetThermostatDeviceInfo(binarySensor.Device, deviceName, deviceId, controllerId);
-                DiscoveryHelpers.ApplyAvailabilityInformation(binarySensor, _topicBuilder);
+                _availabilityDecorator.ApplyAvailabilityInformation(binarySensor);
 
                 binarySensor.Name = $"{deviceName} Alarms";
                 binarySensor.DeviceClass = HassDeviceClass.Problem;

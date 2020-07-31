@@ -213,7 +213,7 @@ namespace MBW.UponorApi
 
                 foreach (UponorObject o in resp.Result.Objects)
                     foreach (var prop in o.Properties)
-                        responseContainer.AddResponse(Convert.ToInt32(o.Id), (UponorProperties)prop.Key, prop.Value);
+                        responseContainer.AddResponse(Convert.ToInt32(o.Id), (UponorProperties)prop.Key, prop.Value.Value);
             }
 
             return responseContainer;

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using MBW.HassMQTT.Helpers;
-using MBW.Uponor2MQTT.Configuration;
+using MBW.HassMQTT.Services;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -10,18 +9,18 @@ using MQTTnet.Client;
 using MQTTnet.Client.Disconnecting;
 using MQTTnet.Client.Options;
 
-namespace MBW.Uponor2MQTT.Service
+namespace MBW.HassMQTT.CommonServices.MqttReconnect
 {
-    internal class MqttConnectionService : BackgroundService
+    internal class MqttReconnectionService : BackgroundService
     {
-        private readonly ILogger<MqttConnectionService> _logger;
+        private readonly ILogger<MqttReconnectionService> _logger;
         private readonly MqttEvents _mqttEvents;
         private readonly IMqttClient _mqttClient;
         private readonly IMqttClientOptions _mqttConnectOptions;
         private readonly IHostApplicationLifetime _lifetime;
-        private readonly MqttConfiguration _mqttConfig;
+        private readonly MqttReconnectionServiceConfig _mqttConfig;
 
-        public MqttConnectionService(ILogger<MqttConnectionService> logger, MqttEvents mqttEvents, IMqttClient mqttClient, IMqttClientOptions mqttConnectOptions, IOptions<MqttConfiguration> mqttConfig, IHostApplicationLifetime lifetime)
+        public MqttReconnectionService(ILogger<MqttReconnectionService> logger, MqttEvents mqttEvents, IMqttClient mqttClient, IMqttClientOptions mqttConnectOptions, IOptions<MqttReconnectionServiceConfig> mqttConfig, IHostApplicationLifetime lifetime)
         {
             _logger = logger;
             _mqttEvents = mqttEvents;

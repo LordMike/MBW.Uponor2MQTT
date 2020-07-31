@@ -1,5 +1,5 @@
-﻿using MBW.HassMQTT.DiscoveryModels.Helpers;
-using MBW.HassMQTT.Interfaces;
+﻿using MBW.HassMQTT.Abstracts.Interfaces;
+using MBW.HassMQTT.DiscoveryModels.Helpers;
 using Newtonsoft.Json.Linq;
 
 namespace MBW.HassMQTT.DiscoveryModels

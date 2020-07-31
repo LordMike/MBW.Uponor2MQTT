@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT;
+using MBW.HassMQTT.CommonServices.Commands;
 using MBW.Uponor2MQTT.Features;
 using MBW.UponorApi;
 using MBW.UponorApi.Enums;
@@ -11,7 +12,7 @@ using MQTTnet;
 
 namespace MBW.Uponor2MQTT.Commands
 {
-    internal class SetSetpointCommand : ICommandHandler
+    internal class SetSetpointCommand : IMqttCommandHandler
     {
         private readonly ILogger<SetSetpointCommand> _logger;
         private readonly UhomeUponorClient _client;

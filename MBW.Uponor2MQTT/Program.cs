@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Net.Http;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT;
-using MBW.HassMQTT.Helpers;
-using MBW.HassMQTT.Mqtt;
+using MBW.HassMQTT.CommonServices.AliveAndWill;
+using MBW.HassMQTT.CommonServices.Commands;
+using MBW.HassMQTT.CommonServices.MqttReconnect;
+using MBW.HassMQTT.Services;
+using MBW.HassMQTT.Topics;
 using MBW.Uponor2MQTT.Commands;
 using MBW.Uponor2MQTT.Configuration;
 using MBW.Uponor2MQTT.Features;
 using MBW.Uponor2MQTT.HASS;
 using MBW.Uponor2MQTT.Helpers;
-using MBW.Uponor2MQTT.MQTT;
 using MBW.Uponor2MQTT.Service;
 using MBW.UponorApi;
 using MBW.UponorApi.Configuration;
@@ -38,32 +39,7 @@ namespace MBW.Uponor2MQTT
                 .WriteTo.Console()
                 .CreateLogger();
 
-            IHostBuilder hostBuilder = CreateHostBuilder(args);
-
-            {
-                //IHost host = hostBuilder.Build();
-                //UhomeUponorClient cl = host.Services.GetRequiredService<UhomeUponorClient>();
-
-                //SystemProperties res2 = await cl.GetSystemInfo();
-
-                //string str2 = JsonConvert.SerializeObject(res2, Formatting.Indented);
-
-                //UponorResponseContainer res = await cl.GetAll();
-                //string str = JsonConvert.SerializeObject(res, Formatting.Indented);
-
-                //while (true)
-                //{
-                //    //SystemProperties res = await cl.GetSystemInfo();
-                //    var res = await cl.GetAll();
-
-                //    string str = JsonConvert.SerializeObject(res, Formatting.Indented);
-                //    Console.WriteLine(str);
-
-                //    await Task.Delay(TimeSpan.FromSeconds(5));
-                //}
-            }
-
-            await hostBuilder.RunConsoleAsync();
+            await CreateHostBuilder(args).RunConsoleAsync();
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
@@ -96,33 +72,17 @@ namespace MBW.Uponor2MQTT
         {
             services
                 .Configure<MqttConfiguration>(context.Configuration.GetSection("MQTT"))
-                .AddSingleton<IMqttFactory>(provider =>
-                {
-                    ILoggerFactory loggerFactory = provider.GetRequiredService<ILoggerFactory>();
-                    ExtensionsLoggingMqttLogger logger = new ExtensionsLoggingMqttLogger(loggerFactory, "MqttNet");
-
-                    return new MqttFactory(logger);
-                })
-                .AddHostedService<HassAliveAndWillService>()
-                .AddHostedService<MqttConnectionService>()
-                .AddSingleton<MqttEvents>()
-                .AddHostedService<MqttMessageDistributor>()
+                .AddMqttClientFactoryWithLogging()
                 .AddSingleton<IMqttClientOptions>(provider =>
                 {
                     MqttConfiguration mqttConfig = provider.GetOptions<MqttConfiguration>();
-                    HassMqttTopicBuilder topicBuilder = provider.GetRequiredService<HassMqttTopicBuilder>();
 
                     // Prepare options
                     MqttClientOptionsBuilder optionsBuilder = new MqttClientOptionsBuilder()
                         .WithTcpServer(mqttConfig.Server, mqttConfig.Port)
                         .WithCleanSession(false)
                         .WithClientId(mqttConfig.ClientId)
-                        .WithWillMessage(new MqttApplicationMessage
-                        {
-                            Topic = topicBuilder.GetSystemTopic("status"),
-                            Payload = Encoding.UTF8.GetBytes(HassAliveAndWillService.ProblemMessage),
-                            Retain = true
-                        });
+                        .ConfigureHassConnectedEntityServiceLastWill(provider);
 
                     if (!string.IsNullOrEmpty(mqttConfig.Username))
                         optionsBuilder.WithCredentials(mqttConfig.Username, mqttConfig.Password);
@@ -162,6 +122,26 @@ namespace MBW.Uponor2MQTT
                     mqttClient.ConnectAsync(options, stoppingtoken);
 
                     return mqttClient;
+                });
+
+            // MQTT Services
+            services
+                .AddMqttMessageReceiverService()
+                .AddMqttEvents();
+
+            // MQTT Reconnect service
+            services
+                .AddMqttReconnectService()
+                .Configure<MqttReconnectionServiceConfig>(context.Configuration.GetSection("MQTT"));
+
+            // Hass Connected service (MQTT Last Will)
+            services
+                .AddHassConnectedEntityServiceExtensions()
+                .Configure<HassConnectedEntityServiceConfig>(x =>
+                {
+                    x.DeviceId = "Uponor2MQTT";
+                    x.DiscoveryDeviceName = "Uponor2MQTT";
+                    x.DiscoveryEntityName = "Uponor2MQTT Status";
                 });
 
             services
@@ -207,11 +187,9 @@ namespace MBW.Uponor2MQTT
                 .AddHostedService<UponorThermostatsService>();
 
             services
-                .AddSingleton<MqttCommandService>()
-                .AddHostedService(x => x.GetRequiredService<MqttCommandService>())
-                .AddSingleton<IMqttMessageReceiver>(x => x.GetRequiredService<MqttCommandService>())
-                .AddSingleton<ICommandHandler, SetSetpointCommand>()
-                .AddSingleton<ICommandHandler, SetRoomnameCommand>();
+                .AddMqttCommandService()
+                .AddMqttCommandHandler<SetSetpointCommand>()
+                .AddMqttCommandHandler<SetRoomnameCommand>();
         }
     }
 }

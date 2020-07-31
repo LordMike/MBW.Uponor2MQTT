@@ -34,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MBW.HassMQTT.CommonServices\MBW.HassMQTT.CommonServices.csproj" />
     <ProjectReference Include="..\MBW.HassMQTT.DiscoveryModels\MBW.HassMQTT.DiscoveryModels.csproj" />
     <ProjectReference Include="..\MBW.HassMQTT\MBW.HassMQTT.csproj" />
     <ProjectReference Include="..\MBW.UponorApi\MBW.UponorApi.csproj" />

@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Text;
 
-namespace MBW.HassMQTT.Mqtt
+namespace MBW.HassMQTT.Topics
 {
     public class HassMqttTopicBuilder
     {

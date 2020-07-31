@@ -2,9 +2,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using MQTTnet;
 
-namespace MBW.Uponor2MQTT.Commands
+namespace MBW.HassMQTT.CommonServices.Commands
 {
-    internal interface ICommandHandler
+    public interface IMqttCommandHandler
     {
         string[] GetFilter();
 

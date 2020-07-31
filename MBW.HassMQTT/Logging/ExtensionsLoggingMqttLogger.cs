@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Logging;
 using MQTTnet.Diagnostics;
 
-namespace MBW.HassMQTT.Helpers
+namespace MBW.HassMQTT.Logging
 {
     /// <summary>
     /// Logging class to map between <see cref="IMqttNetLogger"/>, <see cref="IMqttNetScopedLogger"/> and <see cref="ILogger"/>
     /// </summary>
-    public class ExtensionsLoggingMqttLogger : IMqttNetLogger, IMqttNetScopedLogger
+    internal class ExtensionsLoggingMqttLogger : IMqttNetLogger, IMqttNetScopedLogger
     {
         private readonly ILoggerFactory _loggerFactory;
         private readonly ILogger _logger;

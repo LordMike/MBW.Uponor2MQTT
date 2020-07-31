@@ -1,4 +1,4 @@
-﻿namespace MBW.HassMQTT.Mqtt
+﻿namespace MBW.HassMQTT
 {
     public class HassConfiguration
     {

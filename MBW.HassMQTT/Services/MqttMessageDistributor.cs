@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using MQTTnet;
 using MQTTnet.Client;
 
-namespace MBW.Uponor2MQTT.MQTT
+namespace MBW.HassMQTT.Services
 {
     internal class MqttMessageDistributor : IHostedService
     {
