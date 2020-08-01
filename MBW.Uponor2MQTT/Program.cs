@@ -109,6 +109,7 @@ namespace MBW.Uponor2MQTT
                     IMqttClient mqttClient = factory.CreateMqttClient();
 
                     // Hook up event handlers
+                    // TODO: Move to MBW.HassMQTT
                     mqttClient.UseDisconnectedHandler(async args =>
                     {
                         await mqttEvents.InvokeDisconnectHandler(args, stoppingtoken);
@@ -145,6 +146,7 @@ namespace MBW.Uponor2MQTT
                 });
 
             services
+                .Configure<HassConfiguration>(x => x.TopicPrefix = "uhomeuponor")
                 .Configure<HassConfiguration>(context.Configuration.GetSection("HASS"))
                 .Configure<UponorConfiguration>(context.Configuration.GetSection("Uponor"))
                 .Configure<UponorOperationConfiguration>(context.Configuration.GetSection("Uponor"))
