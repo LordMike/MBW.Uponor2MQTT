@@ -23,9 +23,6 @@ namespace MBW.Uponor2MQTT.Service
 {
     internal class UponorDiscoveryService : BackgroundService
     {
-        [Obsolete]
-        private const int ReadingValiditySeconds = 5400; // 5400s = 1h30m
-
         private readonly ILogger<UponorDiscoveryService> _logger;
         private readonly UponorOperationConfiguration _operationConfig;
         private readonly UhomeUponorClient _uponorClient;
@@ -285,7 +282,6 @@ namespace MBW.Uponor2MQTT.Service
                 sensor.Name = $"{deviceName} Humidity";
                 sensor.DeviceClass = HassDeviceClass.Humidity;
                 sensor.UnitOfMeasurement = "%";
-                sensor.ExpireAfter = ReadingValiditySeconds;
 
                 sensor.StateTopic = _topicBuilder.GetEntityTopic(deviceId, "humidity", "state");
                 sensor.JsonAttributesTopic = _topicBuilder.GetAttributesTopic(deviceId, "humidity");
@@ -298,7 +294,6 @@ namespace MBW.Uponor2MQTT.Service
                 sensor.Name = $"{deviceName} Battery";
                 sensor.DeviceClass = HassDeviceClass.Battery;
                 sensor.UnitOfMeasurement = "%";
-                sensor.ExpireAfter = ReadingValiditySeconds;
 
                 sensor.StateTopic = _topicBuilder.GetEntityTopic(deviceId, "battery", "state");
                 sensor.JsonAttributesTopic = _topicBuilder.GetAttributesTopic(deviceId, "battery");
@@ -310,7 +305,6 @@ namespace MBW.Uponor2MQTT.Service
 
                 binarySensor.Name = $"{deviceName} Alarms";
                 binarySensor.DeviceClass = HassDeviceClass.Problem;
-                binarySensor.ExpireAfter = ReadingValiditySeconds;
 
                 binarySensor.StateTopic = _topicBuilder.GetEntityTopic(deviceId, "alarms", "state");
                 binarySensor.JsonAttributesTopic = _topicBuilder.GetAttributesTopic(deviceId, "alarms");
