@@ -8,6 +8,7 @@ using MBW.HassMQTT.CommonServices.AliveAndWill;
 using MBW.HassMQTT.DiscoveryModels;
 using MBW.HassMQTT.DiscoveryModels.Models;
 using MBW.HassMQTT.Topics;
+using MBW.Uponor2MQTT.Configuration;
 using MBW.Uponor2MQTT.Features;
 using MBW.Uponor2MQTT.HASS;
 using MBW.UponorApi;
@@ -26,6 +27,7 @@ namespace MBW.Uponor2MQTT.Service
         private const int ReadingValiditySeconds = 5400; // 5400s = 1h30m
 
         private readonly ILogger<UponorDiscoveryService> _logger;
+        private readonly UponorOperationConfiguration _operationConfig;
         private readonly UhomeUponorClient _uponorClient;
         private readonly HassMqttTopicBuilder _topicBuilder;
         private readonly HassUniqueIdBuilder _uniqueIdBuilder;
@@ -38,6 +40,7 @@ namespace MBW.Uponor2MQTT.Service
         public UponorDiscoveryService(
             ILogger<UponorDiscoveryService> logger,
             IOptions<UponorConfiguration> config,
+            IOptions<UponorOperationConfiguration> operationConfig,
             FeatureManager featureManager,
             UhomeUponorClient uponorClient,
             HassMqttTopicBuilder topicBuilder,
@@ -47,6 +50,7 @@ namespace MBW.Uponor2MQTT.Service
             AvailabilityDecoratorService availabilityDecorator)
         {
             _logger = logger;
+            _operationConfig = operationConfig.Value;
             _uponorClient = uponorClient;
             _topicBuilder = topicBuilder;
             _uniqueIdBuilder = uniqueIdBuilder;
@@ -244,8 +248,21 @@ namespace MBW.Uponor2MQTT.Service
                 climate.ActionTopic = _topicBuilder.GetEntityTopic(deviceId, "temp", "action");
 
                 climate.ModeStateTopic = _topicBuilder.GetEntityTopic(deviceId, "temp", "mode");
-                //climate.Modes = new[] { "off", _detailsContainer.HcMode == HcMode.Heating ? "heat" : "cool" };
-                climate.Modes = new[] { "auto" };
+
+                // Hacks: HASS has an odd way of determining what Climate devices do. 
+                // With HASS, the mode of the device is what the device is set to do. Ie, in a heating-only climate system, they will _always_ be heating
+                // While I prefer that the device is shown as what it's currently doing, given my "auto" settings.
+                switch (_operationConfig.OperationMode)
+                {
+                    case OperationMode.Normal:
+                        climate.Modes = new[] { "auto" };
+                        break;
+                    case OperationMode.ModeWorkaround:
+                        climate.Modes = new[] { "off", _detailsContainer.HcMode == HcMode.Heating ? "heat" : "cool" };
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
 
                 climate.TemperatureCommandTopic = _topicBuilder.GetEntityTopic(deviceId, "temp", "set_setpoint");
                 climate.TemperatureStateTopic = _topicBuilder.GetEntityTopic(deviceId, "temp", "setpoint");

@@ -147,6 +147,7 @@ namespace MBW.Uponor2MQTT
             services
                 .Configure<HassConfiguration>(context.Configuration.GetSection("HASS"))
                 .Configure<UponorConfiguration>(context.Configuration.GetSection("Uponor"))
+                .Configure<UponorOperationConfiguration>(context.Configuration.GetSection("Uponor"))
                 .Configure<ProxyConfiguration>(context.Configuration.GetSection("Proxy"))
                 .AddSingleton(x => new HassMqttTopicBuilder(x.GetOptions<HassConfiguration>()))
                 .AddSingleton<HassUniqueIdBuilder>()

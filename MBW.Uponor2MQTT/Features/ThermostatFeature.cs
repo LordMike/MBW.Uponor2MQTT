@@ -1,16 +1,20 @@
 ﻿using System;
 using MBW.HassMQTT;
+using MBW.Uponor2MQTT.Configuration;
 using MBW.UponorApi;
 using MBW.UponorApi.Enums;
+using Microsoft.Extensions.Options;
 
 namespace MBW.Uponor2MQTT.Features
 {
     internal class ThermostatFeature : FeatureBase
     {
+        private readonly UponorOperationConfiguration _operationConfig;
         private readonly SystemDetailsContainer _systemDetails;
 
-        public ThermostatFeature(IServiceProvider serviceProvider, SystemDetailsContainer systemDetails) : base(serviceProvider)
+        public ThermostatFeature(IServiceProvider serviceProvider, IOptions<UponorOperationConfiguration> operationConfig, SystemDetailsContainer systemDetails) : base(serviceProvider)
         {
+            _operationConfig = operationConfig.Value;
             _systemDetails = systemDetails;
         }
 
@@ -68,7 +72,9 @@ namespace MBW.Uponor2MQTT.Features
                         mode = "cool";
                     }
 
-                    mode = "auto";
+                    // Override Mode as auto
+                    if (_operationConfig.OperationMode == OperationMode.Normal)
+                        mode = "auto";
 
                     sensor.Value = action;
                     modeSensor.Value = mode;

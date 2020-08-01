@@ -3,12 +3,7 @@
 
 This is a proxy application to translate the status of a U@Home Uponor device, to Home Assistant using MQTT. You can run this application in docker, and it will periodically poll the Uponor API for updates.
 
-<!--
-TODO - link to MBW.HassMQTT
-~~This project uses another library of mine, the [MBW.Client.BlueRiiotApi](https://github.com/LordMike/MBW.Client.BlueRiiotApi) ([nuget](https://www.nuget.org/packages/MBW.Client.BlueRiiotAPI)).~~
-
 _This project is not affiliated with or endorsed by Uponor._
--->
 
 # Features
 
@@ -37,6 +32,7 @@ _This project is not affiliated with or endorsed by Uponor._
 | Uponor__Host | yes | | |
 | Uponor__UpdateInterval | | 00:00:30 | Update interval, default: `30 seconds` |
 | Uponor__DiscoveryInterval | | 01:00:00 | Discovery interval, default: `1 hour` |
+| Uponor__OperationMode | | Normal | Override how climate "modes" are shown, by setting this to "ModeWorkaround". Lets HASS show heating thermostats as orange. |
 | Proxy__Uri | | | Set this to pass BlueRiiot API calls through an HTTP proxy |
 
 # Docker images
