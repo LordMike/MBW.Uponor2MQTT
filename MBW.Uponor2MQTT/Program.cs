@@ -6,7 +6,7 @@ using MBW.HassMQTT;
 using MBW.HassMQTT.CommonServices.AliveAndWill;
 using MBW.HassMQTT.CommonServices.Commands;
 using MBW.HassMQTT.CommonServices.MqttReconnect;
-using MBW.HassMQTT.Services;
+using MBW.HassMQTT.Extensions;
 using MBW.HassMQTT.Topics;
 using MBW.Uponor2MQTT.Commands;
 using MBW.Uponor2MQTT.Configuration;
@@ -94,30 +94,16 @@ namespace MBW.Uponor2MQTT
                 })
                 .AddSingleton<IMqttClient>(provider =>
                 {
+                    // TODO: Support TLS & client certs
                     IHostApplicationLifetime appLifetime = provider.GetRequiredService<IHostApplicationLifetime>();
                     CancellationToken stoppingtoken = appLifetime.ApplicationStopping;
 
-                    MqttEvents mqttEvents = provider.GetRequiredService<MqttEvents>();
-
-                    // TODO: Support TLS & client certs
                     IMqttFactory factory = provider.GetRequiredService<IMqttFactory>();
-
-                    // Prepare options
                     IMqttClientOptions options = provider.GetRequiredService<IMqttClientOptions>();
-
-                    // Create client
                     IMqttClient mqttClient = factory.CreateMqttClient();
 
                     // Hook up event handlers
-                    // TODO: Move to MBW.HassMQTT
-                    mqttClient.UseDisconnectedHandler(async args =>
-                    {
-                        await mqttEvents.InvokeDisconnectHandler(args, stoppingtoken);
-                    });
-                    mqttClient.UseConnectedHandler(async args =>
-                    {
-                        await mqttEvents.InvokeConnectHandler(args, stoppingtoken);
-                    });
+                    mqttClient.ConfigureMqttEvents(provider, stoppingtoken);
 
                     // Connect
                     mqttClient.ConnectAsync(options, stoppingtoken);
@@ -137,22 +123,18 @@ namespace MBW.Uponor2MQTT
 
             // Hass Connected service (MQTT Last Will)
             services
-                .AddHassConnectedEntityServiceExtensions()
-                .Configure<HassConnectedEntityServiceConfig>(x =>
-                {
-                    x.DeviceId = "Uponor2MQTT";
-                    x.DiscoveryDeviceName = "Uponor2MQTT";
-                    x.DiscoveryEntityName = "Uponor2MQTT Status";
-                });
+                .AddHassConnectedEntityService("Uponor2MQTT");
+
+            // Hass system services
+            services
+                .AddSingleton<HassMqttManager>();
 
             services
-                .Configure<HassConfiguration>(x => x.TopicPrefix = "uhomeuponor")
                 .Configure<HassConfiguration>(context.Configuration.GetSection("HASS"))
                 .Configure<UponorConfiguration>(context.Configuration.GetSection("Uponor"))
                 .Configure<UponorOperationConfiguration>(context.Configuration.GetSection("Uponor"))
                 .Configure<ProxyConfiguration>(context.Configuration.GetSection("Proxy"))
                 .AddSingleton(x => new HassMqttTopicBuilder(x.GetOptions<HassConfiguration>()))
-                .AddSingleton<HassUniqueIdBuilder>()
                 .AddHostedService<UponorConnectedService>()
                 .AddHttpClient("uponor")
                 .AddTransientHttpErrorPolicy(builder => builder.WaitAndRetryAsync(new[]
@@ -175,7 +157,6 @@ namespace MBW.Uponor2MQTT
                 provider.GetRequiredService<IHttpClientFactory>().CreateClient("uponor")));
 
             services
-                .AddSingleton<HassMqttManager>()
                 .AddSingleton<FeatureManager>()
                 .AddSingleton<FeatureBase, ControllerFeature>()
                 .AddSingleton<FeatureBase, UhomeFeature>()

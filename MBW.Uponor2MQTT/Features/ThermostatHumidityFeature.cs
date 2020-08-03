@@ -1,5 +1,9 @@
 ﻿using System;
 using MBW.HassMQTT;
+using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.Extensions;
+using MBW.HassMQTT.Interfaces;
+using MBW.Uponor2MQTT.HASS;
 using MBW.UponorApi;
 using MBW.UponorApi.Enums;
 
@@ -18,15 +22,16 @@ namespace MBW.Uponor2MQTT.Features
         {
             foreach ((int controller, int thermostat) in _systemDetails.GetAvailableThermostats())
             {
-                string deviceId = IdBuilder.GetThermostatId(controller, thermostat);
+                string deviceId = HassUniqueIdBuilder.GetThermostatDeviceId(controller, thermostat);
 
                 // Humidity
-                MqttStateValueTopic sensor = HassMqttManager.GetEntityStateValue(deviceId, "humidity", "state");
+                ISensorContainer sensor = HassMqttManager.GetSensor(deviceId, "humidity");
+                MqttStateValueTopic sender = sensor.GetValueSender(HassTopicKind.State);
 
                 if (values.TryGetValue(UponorObjects.Thermostat(UponorThermostats.RhValue, controller, thermostat),
                     UponorProperties.Value, out object objVal))
                 {
-                    sensor.Value = objVal;
+                    sender.Value = objVal;
                 }
             }
         }

@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using MBW.HassMQTT;
 using MBW.HassMQTT.CommonServices.AliveAndWill;
 using MBW.HassMQTT.DiscoveryModels;
+using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Models;
-using MBW.HassMQTT.Topics;
+using MBW.HassMQTT.Extensions;
+using MBW.HassMQTT.Interfaces;
 using MBW.Uponor2MQTT.Configuration;
 using MBW.Uponor2MQTT.Features;
 using MBW.Uponor2MQTT.HASS;
@@ -26,12 +28,9 @@ namespace MBW.Uponor2MQTT.Service
         private readonly ILogger<UponorDiscoveryService> _logger;
         private readonly UponorOperationConfiguration _operationConfig;
         private readonly UhomeUponorClient _uponorClient;
-        private readonly HassMqttTopicBuilder _topicBuilder;
-        private readonly HassUniqueIdBuilder _uniqueIdBuilder;
         private readonly FeatureManager _featureManager;
         private readonly SystemDetailsContainer _detailsContainer;
         private readonly HassMqttManager _hassMqttManager;
-        private readonly AvailabilityDecoratorService _availabilityDecorator;
         private readonly UponorConfiguration _config;
 
         public UponorDiscoveryService(
@@ -40,21 +39,15 @@ namespace MBW.Uponor2MQTT.Service
             IOptions<UponorOperationConfiguration> operationConfig,
             FeatureManager featureManager,
             UhomeUponorClient uponorClient,
-            HassMqttTopicBuilder topicBuilder,
-            HassUniqueIdBuilder uniqueIdBuilder,
             SystemDetailsContainer detailsContainer,
-            HassMqttManager hassMqttManager,
-            AvailabilityDecoratorService availabilityDecorator)
+            HassMqttManager hassMqttManager)
         {
             _logger = logger;
             _operationConfig = operationConfig.Value;
             _uponorClient = uponorClient;
-            _topicBuilder = topicBuilder;
-            _uniqueIdBuilder = uniqueIdBuilder;
             _featureManager = featureManager;
             _detailsContainer = detailsContainer;
             _hassMqttManager = hassMqttManager;
-            _availabilityDecorator = availabilityDecorator;
             _config = config.Value;
         }
 
@@ -177,54 +170,55 @@ namespace MBW.Uponor2MQTT.Service
         private void CreateEntities(UponorResponseContainer values)
         {
             // System
-            string uHomeDeviceId = _uniqueIdBuilder.GetUhomeId();
+            string uHomeDeviceId = HassUniqueIdBuilder.GetUhomeDeviceId();
 
             {
                 const string entityId = "uhome";
-                MqttSensor sensor = _hassMqttManager.ConfigureDiscovery<MqttSensor>(uHomeDeviceId, entityId);
-
-                sensor.Device.Name = "Uponor U@Home";
-                sensor.Device.Identifiers = new[] { uHomeDeviceId };
-                sensor.Device.Manufacturer = "Uponor";
-
-                sensor.StateTopic = _topicBuilder.GetEntityTopic(uHomeDeviceId, entityId, "state");
-                sensor.JsonAttributesTopic = _topicBuilder.GetAttributesTopic(uHomeDeviceId, entityId);
-
-                _availabilityDecorator.ApplyAvailabilityInformation(sensor);
+                IDiscoveryDocumentBuilder<MqttSensor> builder = _hassMqttManager.ConfigureSensor<MqttSensor>(uHomeDeviceId, entityId)
+                    .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
+                    .ConfigureDevice(device =>
+                    {
+                        device.Name = "Uponor U@Home";
+                        device.Identifiers = new[] { uHomeDeviceId };
+                        device.Manufacturer = "Uponor";
+                    })
+                    .ConfigureAliveService();
             }
 
             // Controllers
             foreach (int controller in _detailsContainer.GetAvailableControllers())
             {
-                string deviceId = _uniqueIdBuilder.GetControllerId(controller);
+                string deviceId = HassUniqueIdBuilder.GetControllerDeviceId(controller);
                 const string entityId = "controller";
 
-                MqttSensor sensor = _hassMqttManager.ConfigureDiscovery<MqttSensor>(deviceId, entityId);
-
-                sensor.Device.Name = $"Uponor Controller {controller}";
-                sensor.Device.Identifiers = new[] { deviceId };
-                sensor.Device.Manufacturer = "Uponor";
-                sensor.Device.ViaDevice = uHomeDeviceId;
-
-                sensor.StateTopic = _topicBuilder.GetEntityTopic(deviceId, entityId, "state");
-                sensor.JsonAttributesTopic = _topicBuilder.GetAttributesTopic(deviceId, entityId);
-                
-                _availabilityDecorator.ApplyAvailabilityInformation(sensor);
+                _hassMqttManager.ConfigureSensor<MqttSensor>(deviceId, entityId)
+                    .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
+                    .ConfigureDevice(device =>
+                    {
+                        device.Name = $"Uponor Controller {controller}";
+                        device.Identifiers = new[] { deviceId };
+                        device.Manufacturer = "Uponor";
+                        device.ViaDevice = uHomeDeviceId;
+                    })
+                    .ConfigureAliveService();
             }
 
             // Thermostats
-            void SetThermostatDeviceInfo(MqttDeviceDocument device, string name, string deviceId, string controllerId)
+            void SetThermostatDeviceInfo<TEntity>(IDiscoveryDocumentBuilder<TEntity> builder, string name, string deviceId, string controllerId) where TEntity : MqttSensorDiscoveryBase
             {
-                device.Name = name;
-                device.Identifiers = new[] { deviceId };
-                device.Manufacturer = "Uponor";
-                device.ViaDevice = controllerId;
+                builder.ConfigureDevice(device =>
+                {
+                    device.Name = name;
+                    device.Identifiers = new[] { deviceId };
+                    device.Manufacturer = "Uponor";
+                    device.ViaDevice = controllerId;
+                });
             }
 
             foreach ((int controller, int thermostat) in _detailsContainer.GetAvailableThermostats())
             {
-                string controllerId = _uniqueIdBuilder.GetControllerId(controller);
-                string deviceId = _uniqueIdBuilder.GetThermostatId(controller, thermostat);
+                string controllerId = HassUniqueIdBuilder.GetControllerDeviceId(controller);
+                string deviceId = HassUniqueIdBuilder.GetThermostatDeviceId(controller, thermostat);
 
                 // Name
                 string deviceName = $"Thermostat {controller}.{thermostat}";
@@ -233,18 +227,19 @@ namespace MBW.Uponor2MQTT.Service
                     deviceName = stringVal;
 
                 // Climate
-                MqttClimate climate = _hassMqttManager.ConfigureDiscovery<MqttClimate>(deviceId, "temp");
-                SetThermostatDeviceInfo(climate.Device, deviceName, deviceId, controllerId);
-                _availabilityDecorator.ApplyAvailabilityInformation(climate);
+                IDiscoveryDocumentBuilder<MqttClimate> climateBuilder = _hassMqttManager.ConfigureSensor<MqttClimate>(deviceId, "temp")
+                    .ConfigureTopics(HassTopicKind.JsonAttributes)
+                    .ConfigureTopics(HassTopicKind.CurrentTemperature, HassTopicKind.AwayModeState, HassTopicKind.Action, HassTopicKind.ModeState)
+                    .ConfigureTopics(HassTopicKind.TemperatureCommand, HassTopicKind.TemperatureState)
+                    .ConfigureDiscovery(discovery =>
+                    {
+                        discovery.Name = $"{deviceName} Thermostat";
+                        discovery.Precision = 0.1f;
+                        discovery.TempStep = 0.5f;
+                    })
+                    .ConfigureAliveService();
 
-                climate.Name = $"{deviceName} Thermostat";
-
-                climate.JsonAttributesTopic = _topicBuilder.GetAttributesTopic(deviceId, "temp");
-                climate.CurrentTemperatureTopic = _topicBuilder.GetEntityTopic(deviceId, "temp", "state");
-                climate.AwayModeStateTopic = _topicBuilder.GetEntityTopic(deviceId, "temp", "awaymode");
-                climate.ActionTopic = _topicBuilder.GetEntityTopic(deviceId, "temp", "action");
-
-                climate.ModeStateTopic = _topicBuilder.GetEntityTopic(deviceId, "temp", "mode");
+                SetThermostatDeviceInfo(climateBuilder, deviceName, deviceId, controllerId);
 
                 // Hacks: HASS has an odd way of determining what Climate devices do. 
                 // With HASS, the mode of the device is what the device is set to do. Ie, in a heating-only climate system, they will _always_ be heating
@@ -252,62 +247,60 @@ namespace MBW.Uponor2MQTT.Service
                 switch (_operationConfig.OperationMode)
                 {
                     case OperationMode.Normal:
-                        climate.Modes = new[] { "auto" };
+                        climateBuilder.Discovery.Modes = new[] { "auto" };
                         break;
                     case OperationMode.ModeWorkaround:
-                        climate.Modes = new[] { "off", _detailsContainer.HcMode == HcMode.Heating ? "heat" : "cool" };
+                        climateBuilder.Discovery.Modes = new[] { "off", _detailsContainer.HcMode == HcMode.Heating ? "heat" : "cool" };
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
 
-                climate.TemperatureCommandTopic = _topicBuilder.GetEntityTopic(deviceId, "temp", "set_setpoint");
-                climate.TemperatureStateTopic = _topicBuilder.GetEntityTopic(deviceId, "temp", "setpoint");
-                climate.Precision = 0.1f;
-                climate.TempStep = 0.5f;
-
                 if (values.TryGetValue(UponorObjects.Thermostat(UponorThermostats.MinSetpoint, controller, thermostat),
                     UponorProperties.Value, out float floatVal))
-                    climate.MinTemp = floatVal;
+                    climateBuilder.Discovery.MinTemp = floatVal;
 
                 if (values.TryGetValue(UponorObjects.Thermostat(UponorThermostats.MaxSetpoint, controller, thermostat),
                     UponorProperties.Value, out floatVal))
-                    climate.MaxTemp = floatVal;
+                    climateBuilder.Discovery.MaxTemp = floatVal;
 
                 // Humidity
-                MqttSensor sensor = _hassMqttManager.ConfigureDiscovery<MqttSensor>(deviceId, "humidity");
-                SetThermostatDeviceInfo(sensor.Device, deviceName, deviceId, controllerId);
-                _availabilityDecorator.ApplyAvailabilityInformation(sensor);
+                IDiscoveryDocumentBuilder<MqttSensor> sensorBuilder = _hassMqttManager.ConfigureSensor<MqttSensor>(deviceId, "humidity")
+                    .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
+                    .ConfigureDiscovery(discovery =>
+                    {
+                        discovery.Name = $"{deviceName} Humidity";
+                        discovery.DeviceClass = HassDeviceClass.Humidity;
+                        discovery.UnitOfMeasurement = "%";
+                    })
+                    .ConfigureAliveService();
 
-                sensor.Name = $"{deviceName} Humidity";
-                sensor.DeviceClass = HassDeviceClass.Humidity;
-                sensor.UnitOfMeasurement = "%";
-
-                sensor.StateTopic = _topicBuilder.GetEntityTopic(deviceId, "humidity", "state");
-                sensor.JsonAttributesTopic = _topicBuilder.GetAttributesTopic(deviceId, "humidity");
+                SetThermostatDeviceInfo(sensorBuilder, deviceName, deviceId, controllerId);
 
                 // Battery sensor
-                sensor = _hassMqttManager.ConfigureDiscovery<MqttSensor>(deviceId, "battery");
-                SetThermostatDeviceInfo(sensor.Device, deviceName, deviceId, controllerId);
-                _availabilityDecorator.ApplyAvailabilityInformation(sensor);
+                sensorBuilder = _hassMqttManager.ConfigureSensor<MqttSensor>(deviceId, "battery")
+                    .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
+                    .ConfigureDiscovery(discovery =>
+                    {
+                        discovery.Name = $"{deviceName} Battery";
+                        discovery.DeviceClass = HassDeviceClass.Battery;
+                        discovery.UnitOfMeasurement = "%";
+                    })
+                    .ConfigureAliveService();
 
-                sensor.Name = $"{deviceName} Battery";
-                sensor.DeviceClass = HassDeviceClass.Battery;
-                sensor.UnitOfMeasurement = "%";
-
-                sensor.StateTopic = _topicBuilder.GetEntityTopic(deviceId, "battery", "state");
-                sensor.JsonAttributesTopic = _topicBuilder.GetAttributesTopic(deviceId, "battery");
+                SetThermostatDeviceInfo(sensorBuilder, deviceName, deviceId, controllerId);
 
                 // Alarm sensor
-                MqttBinarySensor binarySensor = _hassMqttManager.ConfigureDiscovery<MqttBinarySensor>(deviceId, "alarms");
-                SetThermostatDeviceInfo(binarySensor.Device, deviceName, deviceId, controllerId);
-                _availabilityDecorator.ApplyAvailabilityInformation(binarySensor);
+                IDiscoveryDocumentBuilder<MqttBinarySensor> binarySensorBuilder = _hassMqttManager.ConfigureSensor<MqttBinarySensor>(deviceId, "alarms")
+                    .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
+                    .ConfigureDiscovery(discovery =>
+                    {
+                        discovery.Name = $"{deviceName} Alarms";
+                        discovery.DeviceClass = HassDeviceClass.Problem;
+                    })
+                    .ConfigureAliveService();
 
-                binarySensor.Name = $"{deviceName} Alarms";
-                binarySensor.DeviceClass = HassDeviceClass.Problem;
-
-                binarySensor.StateTopic = _topicBuilder.GetEntityTopic(deviceId, "alarms", "state");
-                binarySensor.JsonAttributesTopic = _topicBuilder.GetAttributesTopic(deviceId, "alarms");
+                SetThermostatDeviceInfo(binarySensorBuilder, deviceName, deviceId, controllerId);
             }
         }
     }

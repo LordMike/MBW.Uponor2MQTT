@@ -1,6 +1,9 @@
 ﻿using System;
-using MBW.HassMQTT;
+using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.Extensions;
+using MBW.HassMQTT.Interfaces;
 using MBW.Uponor2MQTT.Configuration;
+using MBW.Uponor2MQTT.HASS;
 using MBW.UponorApi;
 using MBW.UponorApi.Enums;
 using Microsoft.Extensions.Options;
@@ -22,32 +25,23 @@ namespace MBW.Uponor2MQTT.Features
         {
             foreach ((int controller, int thermostat) in _systemDetails.GetAvailableThermostats())
             {
-                string deviceId = IdBuilder.GetThermostatId(controller, thermostat);
+                string deviceId = HassUniqueIdBuilder.GetThermostatDeviceId(controller, thermostat);
 
                 // Temperature
-                MqttStateValueTopic sensor = HassMqttManager.GetEntityStateValue(deviceId, "temp", "state");
+                ISensorContainer sensor = HassMqttManager.GetSensor(deviceId, "temp");
 
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.RoomTemperature, controller, thermostat),
                     UponorProperties.Value, out object objVal))
-                {
-                    sensor.Value = objVal;
-                }
+                    sensor.SetValue(HassTopicKind.TemperatureState, objVal);
 
                 // Setpoint
-                sensor = HassMqttManager.GetEntityStateValue(deviceId, "temp", "setpoint");
-
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.RoomSetpoint, controller, thermostat),
                     UponorProperties.Value, out objVal))
-                {
-                    sensor.Value = objVal;
-                }
+                    sensor.SetValue(HassTopicKind.TemperatureCommand, objVal);
 
                 // Action & Mode
-                sensor = HassMqttManager.GetEntityStateValue(deviceId, "temp", "action");
-                MqttStateValueTopic modeSensor = HassMqttManager.GetEntityStateValue(deviceId, "temp", "mode");
-
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.RoomInDemand, controller, thermostat),
                     UponorProperties.Value, out int intVal))
@@ -75,24 +69,22 @@ namespace MBW.Uponor2MQTT.Features
                     // Override Mode as auto
                     if (_operationConfig.OperationMode == OperationMode.Normal)
                         mode = "auto";
-
-                    sensor.Value = action;
-                    modeSensor.Value = mode;
+                    
+                    sensor.SetValue(HassTopicKind.Action, action);
+                    sensor.SetValue(HassTopicKind.ModeState, mode);
                 }
 
                 // Home/away
-                sensor = HassMqttManager.GetEntityStateValue(deviceId, "temp", "awaymode");
-
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.HomeAwayModeStatus, controller, thermostat),
                     UponorProperties.Value, out intVal))
                 {
                     if (intVal > 0)
                         // Away
-                        sensor.Value = "on";
+                        sensor.SetValue(HassTopicKind.AwayModeState, "on");
                     else
                         // Home
-                        sensor.Value = "off";
+                        sensor.SetValue(HassTopicKind.AwayModeState, "off");
                 }
             }
         }

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MBW.HassMQTT;
+using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.Extensions;
+using MBW.HassMQTT.Interfaces;
+using MBW.Uponor2MQTT.HASS;
 using MBW.UponorApi;
 using MBW.UponorApi.Enums;
 
@@ -25,23 +28,21 @@ namespace MBW.Uponor2MQTT.Features
 
             foreach ((int controller, int thermostat) in _systemDetails.GetAvailableThermostats())
             {
-                string deviceId = IdBuilder.GetThermostatId(controller, thermostat);
+                string deviceId = HassUniqueIdBuilder.GetThermostatDeviceId(controller, thermostat);
 
                 // Battery sensor
                 // We don't know what the battery level is with Uponor. So we can only say it's "good" or "bad"
-                MqttStateValueTopic sensor = HassMqttManager.GetEntityStateValue(deviceId, "battery", "state");
+                ISensorContainer sensor = HassMqttManager.GetSensor(deviceId, "battery");
 
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.BatteryAlarm, controller, thermostat),
                     UponorProperties.Value, out object objVal) && objVal != null)
-                    sensor.Value = BatteryLow;
+                    sensor.SetValue(HassTopicKind.State, BatteryLow);
                 else
-                    sensor.Value = BatteryOk;
+                    sensor.SetValue(HassTopicKind.State, BatteryOk);
 
                 // Alarm sensor
-                sensor = HassMqttManager.GetEntityStateValue(deviceId, "alarms", "state");
-
-                MqttAttributesTopic attributes = HassMqttManager.GetAttributesValue(deviceId, "alarms");
+                sensor = HassMqttManager.GetSensor(deviceId, "alarms");
 
                 problems.Clear();
 
@@ -51,40 +52,40 @@ namespace MBW.Uponor2MQTT.Features
                     UponorProperties.Value, out objVal) && objVal != null)
                 {
                     problems.Add("No signal");
-                    attributes.SetAttribute("signal", "alarm");
+                    sensor.SetAttribute("signal", "alarm");
                 }
                 else
-                    attributes.SetAttribute("signal", "ok");
+                    sensor.SetAttribute("signal", "ok");
 
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.TechnicalAlarm, controller, thermostat),
                     UponorProperties.Value, out objVal) && objVal != null)
                 {
                     problems.Add("Technical (?)");
-                    attributes.SetAttribute("technical", "alarm");
+                    sensor.SetAttribute("technical", "alarm");
                 }
                 else
-                    attributes.SetAttribute("technical", "ok");
+                    sensor.SetAttribute("technical", "ok");
 
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.TamperIndication, controller, thermostat),
                     UponorProperties.Value, out objVal) && objVal != null)
                 {
                     problems.Add("Tampering");
-                    attributes.SetAttribute("tampering", "alarm");
+                    sensor.SetAttribute("tampering", "alarm");
                 }
                 else
-                    attributes.SetAttribute("tampering", "ok");
+                    sensor.SetAttribute("tampering", "ok");
 
                 if (problems.Any())
                 {
-                    sensor.Value = "on";
-                    attributes.SetAttribute("problem", string.Join(", ", problems));
+                    sensor.SetValue(HassTopicKind.State, "on");
+                    sensor.SetAttribute("problem", string.Join(", ", problems));
                 }
                 else
                 {
-                    sensor.Value = "off";
-                    attributes.SetAttribute("problem", string.Empty);
+                    sensor.SetValue(HassTopicKind.State, "off");
+                    sensor.SetAttribute("problem", string.Empty);
                 }
             }
         }

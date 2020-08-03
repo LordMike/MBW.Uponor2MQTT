@@ -1,18 +1,18 @@
 ﻿namespace MBW.Uponor2MQTT.HASS
 {
-    internal class HassUniqueIdBuilder
+    internal static class HassUniqueIdBuilder
     {
-        public string GetUhomeId()
+        public static string GetUhomeDeviceId()
         {
             return "uponor_uhome";
         }
 
-        public string GetControllerId(int controller)
+        public static string GetControllerDeviceId(int controller)
         {
             return $"uponor_c{controller}";
         }
 
-        public string GetThermostatId(int controller, int thermostat)
+        public static string GetThermostatDeviceId(int controller, int thermostat)
         {
             return $"uponor_c{controller}_t{thermostat }";
         }

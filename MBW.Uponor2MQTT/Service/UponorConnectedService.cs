@@ -5,8 +5,8 @@ using MBW.HassMQTT;
 using MBW.HassMQTT.CommonServices.AliveAndWill;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.DiscoveryModels.Models;
-using MBW.HassMQTT.Topics;
-using MBW.Uponor2MQTT.HASS;
+using MBW.HassMQTT.Extensions;
+using MBW.HassMQTT.Interfaces;
 using MBW.UponorApi;
 using Microsoft.Extensions.Hosting;
 using Nito.AsyncEx;
@@ -17,7 +17,6 @@ namespace MBW.Uponor2MQTT.Service
     {
         private readonly HassMqttManager _hassMqttManager;
         private readonly UhomeUponorClient _uponorClient;
-        private readonly AvailabilityDecoratorService _availabilityDecorator;
 
         public const string OkMessage = "ok";
         public const string ProblemMessage = "problem";
@@ -26,34 +25,24 @@ namespace MBW.Uponor2MQTT.Service
         private const string DeviceId = "Uponor2MQTT";
         private const string EntityId = "api_operational";
 
-        private readonly string _stateTopic;
-        private readonly string _attributesTopic;
-
         private readonly TimeSpan _flushInterval = TimeSpan.FromSeconds(5);
         private readonly AsyncAutoResetEvent _shouldFlush = new AsyncAutoResetEvent(false);
 
         public UponorConnectedService(HassMqttManager hassMqttManager,
-            UhomeUponorClient uponorClient,
-            HassMqttTopicBuilder topicBuilder,
-            AvailabilityDecoratorService availabilityDecorator)
+            UhomeUponorClient uponorClient)
         {
             _hassMqttManager = hassMqttManager;
             _uponorClient = uponorClient;
-            _availabilityDecorator = availabilityDecorator;
 
             _version = typeof(Program).Assembly.GetName().Version.ToString(3);
-
-            _stateTopic = topicBuilder.GetSystemTopic(EntityId);
-            _attributesTopic = topicBuilder.GetAttributesTopic(DeviceId, EntityId);
         }
 
         private Task UponorClientOnOnSuccessfulResponse()
         {
-            MqttAttributesTopic attributes = _hassMqttManager.GetAttributesValue(DeviceId, EntityId);
-            MqttStateValueTopic state = _hassMqttManager.GetSystemValue(EntityId);
+            ISensorContainer sensor = _hassMqttManager.GetSensor(DeviceId, EntityId);
 
-            state.Value = OkMessage;
-            attributes.SetAttribute("last_ok", DateTime.UtcNow.ToString("O"));
+            sensor.SetValue(HassTopicKind.State, OkMessage);
+            sensor.SetAttribute("last_ok", DateTime.UtcNow.ToString("O"));
 
             _shouldFlush.Set();
 
@@ -62,12 +51,11 @@ namespace MBW.Uponor2MQTT.Service
 
         private Task UponorClientOnOnFailedResponse(string message)
         {
-            MqttAttributesTopic attributes = _hassMqttManager.GetAttributesValue(DeviceId, EntityId);
-            MqttStateValueTopic state = _hassMqttManager.GetSystemValue(EntityId);
+            ISensorContainer sensor = _hassMqttManager.GetSensor(DeviceId, EntityId);
 
-            state.Value = ProblemMessage;
-            attributes.SetAttribute("last_bad", DateTime.UtcNow.ToString("O"));
-            attributes.SetAttribute("last_bad_status", message);
+            sensor.SetValue(HassTopicKind.State, ProblemMessage);
+            sensor.SetAttribute("last_bad", DateTime.UtcNow.ToString("O"));
+            sensor.SetAttribute("last_bad_status", message);
 
             _shouldFlush.Set();
 
@@ -92,22 +80,23 @@ namespace MBW.Uponor2MQTT.Service
 
         private void CreateSystemEntities()
         {
-            MqttBinarySensor sensor = _hassMqttManager.ConfigureDiscovery<MqttBinarySensor>(DeviceId, EntityId);
+            _hassMqttManager.ConfigureSensor<MqttBinarySensor>(DeviceId, EntityId)
+                .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
+                .ConfigureDevice(device =>
+                {
+                    device.Name = "Uponor2MQTT";
+                    device.Identifiers = new[] { DeviceId };
+                    device.SwVersion = _version;
+                })
+                .ConfigureDiscovery(discovery =>
+                {
+                    discovery.Name = "Uponor2MQTT API Operational";
+                    discovery.DeviceClass = HassDeviceClass.Problem;
 
-            sensor.Device.Name = "Uponor2MQTT";
-            sensor.Device.Identifiers = new[] { DeviceId };
-            sensor.Device.SwVersion = _version;
-
-            sensor.Name = "Uponor2MQTT API Operational";
-            sensor.DeviceClass = HassDeviceClass.Problem;
-
-            sensor.PayloadOn = ProblemMessage;
-            sensor.PayloadOff = OkMessage;
-
-            sensor.StateTopic = _stateTopic;
-            sensor.JsonAttributesTopic = _attributesTopic;
-            
-            _availabilityDecorator.ApplyAvailabilityInformation(sensor);
+                    discovery.PayloadOn = ProblemMessage;
+                    discovery.PayloadOff = OkMessage;
+                })
+                .ConfigureAliveService();
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -115,7 +104,8 @@ namespace MBW.Uponor2MQTT.Service
             CreateSystemEntities();
 
             // Push starting values
-            MqttAttributesTopic attributes = _hassMqttManager.GetAttributesValue(DeviceId, EntityId);
+            MqttAttributesTopic attributes = _hassMqttManager.GetSensor(DeviceId, EntityId)
+                .GetAttributesSender();
 
             attributes.SetAttribute("version", _version);
             attributes.SetAttribute("started", DateTime.UtcNow);

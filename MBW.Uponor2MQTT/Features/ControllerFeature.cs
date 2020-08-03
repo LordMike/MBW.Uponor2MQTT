@@ -1,5 +1,9 @@
 ﻿using System;
 using MBW.HassMQTT;
+using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.Extensions;
+using MBW.HassMQTT.Interfaces;
+using MBW.Uponor2MQTT.HASS;
 using MBW.UponorApi;
 using MBW.UponorApi.Enums;
 
@@ -23,11 +27,13 @@ namespace MBW.Uponor2MQTT.Features
                     UponorProperties.Value, out object val))
                     continue;
 
-                string deviceId = IdBuilder.GetControllerId(controller);
-                MqttStateValueTopic sensor = HassMqttManager.GetEntityStateValue(deviceId, "controller", "state");
-                MqttAttributesTopic attributes = HassMqttManager.GetAttributesValue(deviceId, "controller");
+                string deviceId = HassUniqueIdBuilder.GetControllerDeviceId(controller);
+                ISensorContainer sensor = HassMqttManager.GetSensor(deviceId, "controller");
 
-                sensor.Value = "discovered";
+                MqttStateValueTopic sender = sensor.GetValueSender(HassTopicKind.State);
+                MqttAttributesTopic attributes = sensor.GetAttributesSender();
+
+                sender.Value = "discovered";
                 attributes.SetAttribute("sw_version", val);
             }
         }
