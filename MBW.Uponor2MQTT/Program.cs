@@ -11,7 +11,6 @@ using MBW.HassMQTT.Topics;
 using MBW.Uponor2MQTT.Commands;
 using MBW.Uponor2MQTT.Configuration;
 using MBW.Uponor2MQTT.Features;
-using MBW.Uponor2MQTT.HASS;
 using MBW.Uponor2MQTT.Helpers;
 using MBW.Uponor2MQTT.Service;
 using MBW.UponorApi;
@@ -167,7 +166,6 @@ namespace MBW.Uponor2MQTT
             services
                 .AddSingleton<SystemDetailsContainer>()
                 .AddHostedService<UponorDiscoveryService>()
-                .AddHostedService<UponorSystemService>()
                 .AddHostedService<UponorThermostatsService>();
 
             services

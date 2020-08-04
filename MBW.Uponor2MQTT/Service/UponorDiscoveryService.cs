@@ -174,7 +174,7 @@ namespace MBW.Uponor2MQTT.Service
 
             {
                 const string entityId = "uhome";
-                IDiscoveryDocumentBuilder<MqttSensor> builder = _hassMqttManager.ConfigureSensor<MqttSensor>(uHomeDeviceId, entityId)
+                _hassMqttManager.ConfigureSensor<MqttSensor>(uHomeDeviceId, entityId)
                     .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
                     .ConfigureDevice(device =>
                     {
