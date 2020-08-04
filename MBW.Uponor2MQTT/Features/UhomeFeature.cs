@@ -17,7 +17,8 @@ namespace MBW.Uponor2MQTT.Features
         public override void Process(UponorResponseContainer values)
         {
             string deviceId = HassUniqueIdBuilder.GetUhomeDeviceId();
-            ISensorContainer sensor = HassMqttManager.GetSensor(deviceId, "uhome");
+            if (!HassMqttManager.TryGetSensor(deviceId, "uhome", out ISensorContainer sensor))
+                return;
 
             sensor.SetValue(HassTopicKind.State, "discovered");
 

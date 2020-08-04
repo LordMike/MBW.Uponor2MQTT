@@ -23,6 +23,10 @@ using HassDeviceClass = MBW.HassMQTT.DiscoveryModels.Enum.HassDeviceClass;
 
 namespace MBW.Uponor2MQTT.Service
 {
+    /// <summary>
+    /// This service gathers enough information to discover new thermostats and controllers.
+    /// It should not be run as often as the normal updates, as this will query a lot of details.
+    /// </summary>
     internal class UponorDiscoveryService : BackgroundService
     {
         private readonly ILogger<UponorDiscoveryService> _logger;

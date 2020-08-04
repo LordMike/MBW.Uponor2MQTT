@@ -14,6 +14,10 @@ using Microsoft.Extensions.Options;
 
 namespace MBW.Uponor2MQTT.Service
 {
+    /// <summary>
+    /// This service regularly calls in to discover new temperature and humidity values
+    /// It does not gather enough information to successfully discover new thermostats. <see cref="UponorDiscoveryService"/> does that.
+    /// </summary>
     internal class UponorThermostatsService : BackgroundService
     {
         private readonly ILogger<UponorThermostatsService> _logger;
