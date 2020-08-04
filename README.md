@@ -3,6 +3,8 @@
 
 This is a proxy application to translate the status of a U@Home Uponor device, to Home Assistant using MQTT. You can run this application in docker, and it will periodically poll the Uponor API for updates.
 
+This project uses another library of mine, the [MBW.HassMQTT](https://github.com/LordMike/MBW.HassMQTT) ([nuget](https://www.nuget.org/packages/MBW.HassMQTT)).
+
 _This project is not affiliated with or endorsed by Uponor._
 
 # Features
