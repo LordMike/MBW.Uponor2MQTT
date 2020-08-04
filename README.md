@@ -7,10 +7,10 @@ _This project is not affiliated with or endorsed by Uponor._
 
 # Features
 
+* Creates binary sensors indicating issues with this service, or the U@Home webserver
 * Creates sensors for each Uponor Controller
 * Creates sensors for each Thermostat
   * Tracks temperature, humidity, battery levels and other alarms
-  
 * Write support
   * Setting the Setpoint (target temperature)
   * Setting room names for each thermostat
