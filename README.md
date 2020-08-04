@@ -25,7 +25,7 @@ _This project is not affiliated with or endorsed by Uponor._
 | MQTT__Port | | 1883 | |
 | MQTT__Username | | | |
 | MQTT__Password | | | |
-| MQTT__ClientId | | `blueriiot2mqtt-RANDOM` | |
+| MQTT__ClientId | | `uponor2mqtt` | |
 | MQTT__ReconnectInterval | | `00:00:30` | How long to wait before reconnecting to MQTT |
 | HASS__DiscoveryPrefix | | `homeassistant` | Prefix of HASS discovery topics |
 | HASS__TopicPrefix | | `uponor2mqtt` | Prefix of state and attribute topics |
@@ -33,7 +33,7 @@ _This project is not affiliated with or endorsed by Uponor._
 | Uponor__UpdateInterval | | 00:00:30 | Update interval, default: `30 seconds` |
 | Uponor__DiscoveryInterval | | 01:00:00 | Discovery interval, default: `1 hour` |
 | Uponor__OperationMode | | Normal | Override how climate "modes" are shown, by setting this to "ModeWorkaround". Lets HASS show heating thermostats as orange. |
-| Proxy__Uri | | | Set this to pass BlueRiiot API calls through an HTTP proxy |
+| Proxy__Uri | | | Set this to pass U@Home API calls through an HTTP proxy |
 
 # Docker images
 

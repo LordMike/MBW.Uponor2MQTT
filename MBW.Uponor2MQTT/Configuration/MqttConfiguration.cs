@@ -12,7 +12,7 @@ namespace MBW.Uponor2MQTT.Configuration
 
         public string Password { get; set; }
 
-        public string ClientId { get; set; } = $"blueriiot2mqtt-{new Random().Next()}";
+        public string ClientId { get; set; } = "uponor2mqtt";
 
         public TimeSpan ReconnectInterval { get; set; } = TimeSpan.FromSeconds(30);
 
