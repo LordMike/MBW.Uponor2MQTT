@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace MBW.Uponor2MQTT.Helpers
 {
-    internal static class Extensions
+    internal static class ServiceProviderExtensions
     {
         public static TOptions GetOptions<TOptions>(this IServiceProvider provider) where TOptions : class, new()
         {

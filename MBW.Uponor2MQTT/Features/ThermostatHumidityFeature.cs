@@ -4,6 +4,7 @@ using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.HassMQTT.Extensions;
 using MBW.HassMQTT.Interfaces;
 using MBW.Uponor2MQTT.HASS;
+using MBW.Uponor2MQTT.Validation;
 using MBW.UponorApi;
 using MBW.UponorApi.Enums;
 
@@ -29,9 +30,9 @@ namespace MBW.Uponor2MQTT.Features
                 MqttStateValueTopic sender = sensor.GetValueSender(HassTopicKind.State);
 
                 if (values.TryGetValue(UponorObjects.Thermostat(UponorThermostats.RhValue, controller, thermostat),
-                    UponorProperties.Value, out object objVal))
+                    UponorProperties.Value, out float floatVal) && IsValid.Humidity(floatVal))
                 {
-                    sender.Value = objVal;
+                    sender.Value = floatVal;
                 }
             }
         }

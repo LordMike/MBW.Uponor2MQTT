@@ -4,6 +4,7 @@ using MBW.HassMQTT.Extensions;
 using MBW.HassMQTT.Interfaces;
 using MBW.Uponor2MQTT.Configuration;
 using MBW.Uponor2MQTT.HASS;
+using MBW.Uponor2MQTT.Validation;
 using MBW.UponorApi;
 using MBW.UponorApi.Enums;
 using Microsoft.Extensions.Options;
@@ -32,14 +33,14 @@ namespace MBW.Uponor2MQTT.Features
 
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.RoomTemperature, controller, thermostat),
-                    UponorProperties.Value, out object objVal))
-                    sensor.SetValue(HassTopicKind.TemperatureState, objVal);
+                    UponorProperties.Value, out float floatVal) && IsValid.Temperature(floatVal))
+                    sensor.SetValue(HassTopicKind.TemperatureState, floatVal);
 
                 // Setpoint
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.RoomSetpoint, controller, thermostat),
-                    UponorProperties.Value, out objVal))
-                    sensor.SetValue(HassTopicKind.TemperatureCommand, objVal);
+                    UponorProperties.Value, out floatVal))
+                    sensor.SetValue(HassTopicKind.TemperatureCommand, floatVal);
 
                 // Action & Mode
                 if (values.TryGetValue(
