@@ -7,15 +7,18 @@ using MBW.Uponor2MQTT.HASS;
 using MBW.Uponor2MQTT.Validation;
 using MBW.UponorApi;
 using MBW.UponorApi.Enums;
+using Microsoft.Extensions.Logging;
 
 namespace MBW.Uponor2MQTT.Features
 {
     internal class ThermostatHumidityFeature : FeatureBase
     {
+        private readonly ILogger<ThermostatHumidityFeature> _logger;
         private readonly SystemDetailsContainer _systemDetails;
 
-        public ThermostatHumidityFeature(IServiceProvider serviceProvider, SystemDetailsContainer systemDetails) : base(serviceProvider)
+        public ThermostatHumidityFeature(ILogger<ThermostatHumidityFeature> logger, IServiceProvider serviceProvider, SystemDetailsContainer systemDetails) : base(serviceProvider)
         {
+            _logger = logger;
             _systemDetails = systemDetails;
         }
 
@@ -30,9 +33,12 @@ namespace MBW.Uponor2MQTT.Features
                 MqttStateValueTopic sender = sensor.GetValueSender(HassTopicKind.State);
 
                 if (values.TryGetValue(UponorObjects.Thermostat(UponorThermostats.RhValue, controller, thermostat),
-                    UponorProperties.Value, out float floatVal) && IsValid.Humidity(floatVal))
+                    UponorProperties.Value, out float floatVal))
                 {
-                    sender.Value = floatVal;
+                    if (IsValid.Humidity(floatVal))
+                        sender.Value = floatVal;
+                    else
+                        _logger.LogWarning("Received an invalid humidity of {Value} for {Device}", floatVal, deviceId);
                 }
             }
         }

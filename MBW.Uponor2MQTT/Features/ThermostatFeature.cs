@@ -7,6 +7,7 @@ using MBW.Uponor2MQTT.HASS;
 using MBW.Uponor2MQTT.Validation;
 using MBW.UponorApi;
 using MBW.UponorApi.Enums;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace MBW.Uponor2MQTT.Features
@@ -14,11 +15,13 @@ namespace MBW.Uponor2MQTT.Features
     internal class ThermostatFeature : FeatureBase
     {
         private readonly UponorOperationConfiguration _operationConfig;
+        private readonly ILogger<ThermostatFeature> _logger;
         private readonly SystemDetailsContainer _systemDetails;
 
-        public ThermostatFeature(IServiceProvider serviceProvider, IOptions<UponorOperationConfiguration> operationConfig, SystemDetailsContainer systemDetails) : base(serviceProvider)
+        public ThermostatFeature(ILogger<ThermostatFeature> logger, IServiceProvider serviceProvider, IOptions<UponorOperationConfiguration> operationConfig, SystemDetailsContainer systemDetails) : base(serviceProvider)
         {
             _operationConfig = operationConfig.Value;
+            _logger = logger;
             _systemDetails = systemDetails;
         }
 
@@ -33,8 +36,13 @@ namespace MBW.Uponor2MQTT.Features
 
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.RoomTemperature, controller, thermostat),
-                    UponorProperties.Value, out float floatVal) && IsValid.Temperature(floatVal))
-                    sensor.SetValue(HassTopicKind.TemperatureState, floatVal);
+                    UponorProperties.Value, out float floatVal))
+                {
+                    if (IsValid.Temperature(floatVal))
+                        sensor.SetValue(HassTopicKind.TemperatureState, floatVal);
+                    else
+                        _logger.LogWarning("Received an invalid temperature of {Value} for {Device}", floatVal, deviceId);
+                }
 
                 // Setpoint
                 if (values.TryGetValue(
@@ -70,7 +78,7 @@ namespace MBW.Uponor2MQTT.Features
                     // Override Mode as auto
                     if (_operationConfig.OperationMode == OperationMode.Normal)
                         mode = "auto";
-                    
+
                     sensor.SetValue(HassTopicKind.Action, action);
                     sensor.SetValue(HassTopicKind.ModeState, mode);
                 }
