@@ -283,7 +283,7 @@ namespace MBW.Uponor2MQTT.Service
 
                 // Humidity
                 sensorBuilder = _hassMqttManager.ConfigureSensor<MqttSensor>(deviceId, "humidity")
-                    .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
+                    .ConfigureTopics(HassTopicKind.State)
                     .ConfigureDiscovery(discovery =>
                     {
                         discovery.Name = $"{deviceName} Humidity";
@@ -296,7 +296,7 @@ namespace MBW.Uponor2MQTT.Service
 
                 // Battery sensor
                 sensorBuilder = _hassMqttManager.ConfigureSensor<MqttSensor>(deviceId, "battery")
-                    .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
+                    .ConfigureTopics(HassTopicKind.State)
                     .ConfigureDiscovery(discovery =>
                     {
                         discovery.Name = $"{deviceName} Battery";
