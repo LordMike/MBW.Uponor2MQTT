@@ -161,7 +161,8 @@ namespace MBW.Uponor2MQTT
                 .AddSingleton<FeatureBase, UhomeFeature>()
                 .AddSingleton<FeatureBase, ThermostatFeature>()
                 .AddSingleton<FeatureBase, ThermostatAlarmsFeature>()
-                .AddSingleton<FeatureBase, ThermostatHumidityFeature>();
+                .AddSingleton<FeatureBase, ThermostatHumidityFeature>()
+                .AddSingleton<FeatureBase, ThermostatTemperatureFeature>();
 
             services
                 .AddSingleton<SystemDetailsContainer>()

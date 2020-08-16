@@ -267,9 +267,22 @@ namespace MBW.Uponor2MQTT.Service
                 if (values.TryGetValue(UponorObjects.Thermostat(UponorThermostats.MaxSetpoint, controller, thermostat),
                     UponorProperties.Value, out floatVal))
                     climateBuilder.Discovery.MaxTemp = floatVal;
+                
+                // Temperature
+                IDiscoveryDocumentBuilder<MqttSensor> sensorBuilder = _hassMqttManager.ConfigureSensor<MqttSensor>(deviceId, "temperature")
+                    .ConfigureTopics(HassTopicKind.State)
+                    .ConfigureDiscovery(discovery =>
+                    {
+                        discovery.Name = $"{deviceName} Temperature";
+                        discovery.DeviceClass = HassDeviceClass.Temperature;
+                        discovery.UnitOfMeasurement = "C";
+                    })
+                    .ConfigureAliveService();
+
+                SetThermostatDeviceInfo(sensorBuilder, deviceName, deviceId, controllerId);
 
                 // Humidity
-                IDiscoveryDocumentBuilder<MqttSensor> sensorBuilder = _hassMqttManager.ConfigureSensor<MqttSensor>(deviceId, "humidity")
+                sensorBuilder = _hassMqttManager.ConfigureSensor<MqttSensor>(deviceId, "humidity")
                     .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
                     .ConfigureDiscovery(discovery =>
                     {
