@@ -33,13 +33,13 @@ namespace MBW.Uponor2MQTT.Features
 
                 // Temperature
                 ISensorContainer sensor = HassMqttManager.GetSensor(deviceId, "temp");
-
+                
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.RoomTemperature, controller, thermostat),
                     UponorProperties.Value, out float floatVal))
                 {
                     if (IsValid.Temperature(floatVal))
-                        sensor.SetValue(HassTopicKind.TemperatureState, floatVal);
+                        sensor.SetValue(HassTopicKind.CurrentTemperature, floatVal);
                     else
                         _logger.LogWarning("Received an invalid temperature of {Value} for {Device}", floatVal, deviceId);
                 }
@@ -48,7 +48,7 @@ namespace MBW.Uponor2MQTT.Features
                 if (values.TryGetValue(
                     UponorObjects.Thermostat(UponorThermostats.RoomSetpoint, controller, thermostat),
                     UponorProperties.Value, out floatVal))
-                    sensor.SetValue(HassTopicKind.TemperatureCommand, floatVal);
+                    sensor.SetValue(HassTopicKind.TemperatureState, floatVal);
 
                 // Action & Mode
                 if (values.TryGetValue(

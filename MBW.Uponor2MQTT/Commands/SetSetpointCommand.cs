@@ -2,8 +2,10 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using EnumsNET;
 using MBW.HassMQTT;
 using MBW.HassMQTT.CommonServices.Commands;
+using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.Uponor2MQTT.Features;
 using MBW.UponorApi;
 using MBW.UponorApi.Enums;
@@ -31,8 +33,8 @@ namespace MBW.Uponor2MQTT.Commands
 
         public string[] GetFilter()
         {
-            // <entity>/temp/set_setpoint => Set setpoint
-            return new[] { null, "temp", "set_setpoint" };
+            // <cN_tN>/temp/temperature_command => Set setpoint
+            return new[] { null, "temp", HassTopicKind.TemperatureCommand.AsString(EnumFormat.EnumMemberValue) };
         }
 
         public async Task Handle(string[] topicLevels, MqttApplicationMessage message, CancellationToken token = default)

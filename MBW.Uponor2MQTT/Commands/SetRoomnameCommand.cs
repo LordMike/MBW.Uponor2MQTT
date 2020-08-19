@@ -29,7 +29,7 @@ namespace MBW.Uponor2MQTT.Commands
 
         public string[] GetFilter()
         {
-            // <entity>/set_name => Set name
+            // <cN_tN>/set_name => Set name
             return new[] { null, "set_name" };
         }
 
