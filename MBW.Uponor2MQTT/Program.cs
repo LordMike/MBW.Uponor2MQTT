@@ -126,7 +126,7 @@ namespace MBW.Uponor2MQTT
 
             // Hass system services
             services
-                .AddSingleton<HassMqttManager>();
+                .AddHassMqttManager();
 
             services
                 .Configure<HassConfiguration>(context.Configuration.GetSection("HASS"))
