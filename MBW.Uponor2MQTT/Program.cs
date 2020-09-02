@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT;
-using MBW.HassMQTT.CommonServices.AliveAndWill;
+using MBW.HassMQTT.CommonServices;
 using MBW.HassMQTT.CommonServices.Commands;
 using MBW.HassMQTT.CommonServices.MqttReconnect;
-using MBW.HassMQTT.Extensions;
 using MBW.HassMQTT.Topics;
 using MBW.Uponor2MQTT.Commands;
 using MBW.Uponor2MQTT.Configuration;
@@ -19,9 +17,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MQTTnet;
-using MQTTnet.Client;
-using MQTTnet.Client.Options;
 using Polly;
 using Serilog;
 using WebProxy = System.Net.WebProxy;
@@ -70,63 +65,10 @@ namespace MBW.Uponor2MQTT
         private static void ConfigureServices(HostBuilderContext context, IServiceCollection services)
         {
             services
-                .Configure<MqttConfiguration>(context.Configuration.GetSection("MQTT"))
-                .AddMqttClientFactoryWithLogging()
-                .AddSingleton<IMqttClientOptions>(provider =>
-                {
-                    MqttConfiguration mqttConfig = provider.GetOptions<MqttConfiguration>();
-
-                    // Prepare options
-                    MqttClientOptionsBuilder optionsBuilder = new MqttClientOptionsBuilder()
-                        .WithTcpServer(mqttConfig.Server, mqttConfig.Port)
-                        .WithCleanSession(false)
-                        .WithClientId(mqttConfig.ClientId)
-                        .ConfigureHassConnectedEntityServiceLastWill(provider);
-
-                    if (!string.IsNullOrEmpty(mqttConfig.Username))
-                        optionsBuilder.WithCredentials(mqttConfig.Username, mqttConfig.Password);
-
-                    if (mqttConfig.KeepAlivePeriod.HasValue)
-                        optionsBuilder.WithKeepAlivePeriod(mqttConfig.KeepAlivePeriod.Value);
-
-                    return optionsBuilder.Build();
-                })
-                .AddSingleton<IMqttClient>(provider =>
-                {
-                    // TODO: Support TLS & client certs
-                    IHostApplicationLifetime appLifetime = provider.GetRequiredService<IHostApplicationLifetime>();
-                    CancellationToken stoppingtoken = appLifetime.ApplicationStopping;
-
-                    IMqttFactory factory = provider.GetRequiredService<IMqttFactory>();
-                    IMqttClientOptions options = provider.GetRequiredService<IMqttClientOptions>();
-                    IMqttClient mqttClient = factory.CreateMqttClient();
-
-                    // Hook up event handlers
-                    mqttClient.ConfigureMqttEvents(provider, stoppingtoken);
-
-                    // Connect
-                    mqttClient.ConnectAsync(options, stoppingtoken);
-
-                    return mqttClient;
-                });
-
-            // MQTT Services
-            services
-                .AddMqttMessageReceiverService()
-                .AddMqttEvents();
-
-            // MQTT Reconnect service
-            services
-                .AddMqttReconnectService()
+                .AddAndConfigureMqtt("Uponor2MQTT")
+                .Configure<CommonMqttConfiguration>(x=>x.ClientId = "uponor2mqtt")
+                .Configure<CommonMqttConfiguration>( context.Configuration.GetSection("MQTT"))
                 .Configure<MqttReconnectionServiceConfig>(context.Configuration.GetSection("MQTT"));
-
-            // Hass Connected service (MQTT Last Will)
-            services
-                .AddHassConnectedEntityService("Uponor2MQTT");
-
-            // Hass system services
-            services
-                .AddHassMqttManager();
 
             services
                 .Configure<HassConfiguration>(context.Configuration.GetSection("HASS"))
