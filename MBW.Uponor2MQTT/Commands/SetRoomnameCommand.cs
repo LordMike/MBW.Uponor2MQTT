@@ -1,9 +1,11 @@
+using System;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT;
 using MBW.HassMQTT.CommonServices.Commands;
 using MBW.Uponor2MQTT.Features;
+using MBW.Uponor2MQTT.Helpers;
 using MBW.UponorApi;
 using MBW.UponorApi.Enums;
 using Microsoft.Extensions.Logging;
@@ -47,10 +49,20 @@ namespace MBW.Uponor2MQTT.Commands
 
             await _client.SetValue(obj, UponorProperties.Value, newName, token);
 
-            // Perform new read
-            UponorResponseContainer newValues = await _client.ReadValue(obj, UponorProperties.Value, token);
+            // Perform new read, wait until the value is applied
+            using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            using CancellationTokenSource timeoutToken = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, token);
 
-            _featureManager.Process(newValues);
+            (_, UponorResponseContainer responseContainer) = await _client.WaitUntil(obj, UponorProperties.Value,
+                testContainer =>
+                {
+                    if (!testContainer.TryGetValue(obj, UponorProperties.Value, out string appliedName))
+                        return false;
+
+                    return string.Equals(newName, appliedName, StringComparison.Ordinal);
+                }, timeoutToken.Token);
+
+            _featureManager.Process(responseContainer);
             await _hassMqttManager.FlushAll(token);
         }
     }

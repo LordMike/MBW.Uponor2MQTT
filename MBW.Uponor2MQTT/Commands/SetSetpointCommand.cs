@@ -1,3 +1,4 @@
+using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -7,6 +8,7 @@ using MBW.HassMQTT;
 using MBW.HassMQTT.CommonServices.Commands;
 using MBW.HassMQTT.DiscoveryModels.Enum;
 using MBW.Uponor2MQTT.Features;
+using MBW.Uponor2MQTT.Helpers;
 using MBW.UponorApi;
 using MBW.UponorApi.Enums;
 using Microsoft.Extensions.Logging;
@@ -48,14 +50,24 @@ namespace MBW.Uponor2MQTT.Commands
             string convertPayloadToString = message.ConvertPayloadToString();
             float newSetpoint = float.Parse(convertPayloadToString, _parsingCulture);
 
-            _logger.LogInformation("Setting c{Controller} t{Thermostat} setpoint to {Value}", controller, thermostat,newSetpoint);
+            _logger.LogInformation("Setting c{Controller} t{Thermostat} setpoint to {Value}", controller, thermostat, newSetpoint);
 
             await _client.SetValue(obj, UponorProperties.Value, newSetpoint, token);
 
-            // Perform new read
-            UponorResponseContainer newValues = await _client.ReadValue(obj, UponorProperties.Value, token);
+            // Perform new read, wait until the value is applied
+            using CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            using CancellationTokenSource timeoutToken = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, token);
 
-            _featureManager.Process(newValues);
+            (_, UponorResponseContainer responseContainer) = await _client.WaitUntil(obj, UponorProperties.Value,
+                testContainer =>
+                {
+                    if (!testContainer.TryGetValue(obj, UponorProperties.Value, out float appliedFloat))
+                        return false;
+
+                    return Math.Abs(appliedFloat - newSetpoint) < 0.5f;
+                }, timeoutToken.Token);
+
+            _featureManager.Process(responseContainer);
             await _hassMqttManager.FlushAll(token);
         }
     }
