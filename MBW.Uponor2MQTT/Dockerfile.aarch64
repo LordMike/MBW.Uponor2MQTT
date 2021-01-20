@@ -10,4 +10,4 @@ RUN dotnet publish -c release -o /app -r linux-musl-arm64 --self-contained false
 FROM mcr.microsoft.com/dotnet/runtime:5.0-focal-arm64v8
 WORKDIR /app
 COPY --from=build /app .
-ENTRYPOINT ["./MBW.Uponor2MQTT"]
+ENTRYPOINT ["dotnet", "MBW.Uponor2MQTT.dll"]
