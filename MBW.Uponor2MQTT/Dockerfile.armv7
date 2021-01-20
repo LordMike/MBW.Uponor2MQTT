@@ -1,5 +1,5 @@
-# https://hub.docker.com/_/microsoft-dotnet-core
-FROM mcr.microsoft.com/dotnet/sdk:5.0-focal AS build
+# https://hub.docker.com/_/microsoft-dotnet
+FROM mcr.microsoft.com/dotnet/sdk:5.0-focal-arm32v7 AS build
 WORKDIR /src
 
 COPY . .
@@ -7,7 +7,7 @@ WORKDIR "/src/MBW.Uponor2MQTT/"
 RUN dotnet publish -c release -o /app -r linux-arm --self-contained false
 
 # Final
-FROM mcr.microsoft.com/dotnet/runtime:5.0-focal
+FROM mcr.microsoft.com/dotnet/runtime:5.0-focal-arm32v7
 WORKDIR /app
 COPY --from=build /app .
 ENTRYPOINT ["./MBW.Uponor2MQTT"]
