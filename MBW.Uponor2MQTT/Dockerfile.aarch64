@@ -7,7 +7,7 @@ WORKDIR "/src/MBW.Uponor2MQTT/"
 RUN dotnet publish -c release -o /app -r linux-musl-arm64 --self-contained false
 
 # Final
-FROM mcr.microsoft.com/dotnet/runtime:5.0-alpine-arm64v8
+FROM mcr.microsoft.com/dotnet/runtime:5.0-focal-arm64v8
 WORKDIR /app
 COPY --from=build /app .
 ENTRYPOINT ["./MBW.Uponor2MQTT"]
