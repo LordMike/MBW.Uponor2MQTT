@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using MBW.HassMQTT;
 using MBW.HassMQTT.CommonServices;
 using MBW.HassMQTT.CommonServices.Commands;
-using MBW.HassMQTT.CommonServices.MqttReconnect;
 using MBW.HassMQTT.Topics;
 using MBW.Uponor2MQTT.Commands;
 using MBW.Uponor2MQTT.Configuration;
@@ -67,8 +66,7 @@ namespace MBW.Uponor2MQTT
             services
                 .AddAndConfigureMqtt("Uponor2MQTT")
                 .Configure<CommonMqttConfiguration>(x=>x.ClientId = "uponor2mqtt")
-                .Configure<CommonMqttConfiguration>( context.Configuration.GetSection("MQTT"))
-                .Configure<MqttReconnectionServiceConfig>(context.Configuration.GetSection("MQTT"));
+                .Configure<CommonMqttConfiguration>( context.Configuration.GetSection("MQTT"));
 
             services
                 .Configure<HassConfiguration>(context.Configuration.GetSection("HASS"))
