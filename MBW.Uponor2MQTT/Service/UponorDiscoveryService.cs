@@ -185,6 +185,22 @@ namespace MBW.Uponor2MQTT.Service
                         device.Manufacturer = "Uponor";
                     })
                     .ConfigureAliveService();
+
+                _hassMqttManager.ConfigureSensor<MqttSensor>(uHomeDeviceId, "average_temperature")
+                    .ConfigureTopics(HassTopicKind.State)
+                    .ConfigureDevice(device =>
+                    {
+                        device.Name = "Uponor Average Temperature";
+                        device.Identifiers = new[] { uHomeDeviceId };
+                        device.Manufacturer = "Uponor";
+                    })
+                    .ConfigureDiscovery(discovery =>
+                    {
+                        discovery.Name = "Uponor Average Temperature";
+                        discovery.UnitOfMeasurement = "C";
+                        discovery.DeviceClass = HassDeviceClass.Temperature;
+                    })
+                    .ConfigureAliveService();
             }
 
             // Controllers

@@ -119,7 +119,12 @@ namespace MBW.Uponor2MQTT.Service
                 {
                     // Outdoor sensor
                     UponorObjects.Controller(UponorController.MeasuredOutdoorTemperature, c),
-                }));
+                }))
+                .Concat(new[]
+                {
+                    // Average temperature
+                    UponorObjects.System(UponorSystem.AverageRoomTemperature),
+                });
 
             UponorResponseContainer values = await _uponorClient.ReadValues(objects, new[] { UponorProperties.Value }, stoppingToken);
 

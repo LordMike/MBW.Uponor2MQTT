@@ -99,6 +99,7 @@ namespace MBW.Uponor2MQTT
                 .AddSingleton<FeatureManager>()
                 .AddSingleton<FeatureBase, ControllerFeature>()
                 .AddSingleton<FeatureBase, ControllerOutdoorSensorFeature>()
+                .AddSingleton<FeatureBase, SystemAverageTemperatureFeature>()
                 .AddSingleton<FeatureBase, UhomeFeature>()
                 .AddSingleton<FeatureBase, ThermostatFeature>()
                 .AddSingleton<FeatureBase, ThermostatAlarmsFeature>()
