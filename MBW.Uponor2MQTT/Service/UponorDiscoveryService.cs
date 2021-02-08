@@ -190,7 +190,7 @@ namespace MBW.Uponor2MQTT.Service
                     .ConfigureTopics(HassTopicKind.State)
                     .ConfigureDevice(device =>
                     {
-                        device.Name = "Uponor Average Temperature";
+                        device.Name = "Uponor U@Home";
                         device.Identifiers = new[] { uHomeDeviceId };
                         device.Manufacturer = "Uponor";
                     })
@@ -231,7 +231,7 @@ namespace MBW.Uponor2MQTT.Service
                     .ConfigureTopics(HassTopicKind.State)
                     .ConfigureDevice(device =>
                     {
-                        device.Name = $"Uponor Outdoor Sensor {controller}";
+                        device.Name = $"Uponor Controller {controller}";
                         device.Identifiers = new[] { controllerId };
                         device.Manufacturer = "Uponor";
                         device.ViaDevice = controllerId;
