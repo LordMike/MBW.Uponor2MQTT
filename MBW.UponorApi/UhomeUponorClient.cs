@@ -289,6 +289,10 @@ namespace MBW.UponorApi
                 UponorObjects.Controller(UponorController.ThermostatPresence, 1),
                 UponorObjects.Controller(UponorController.ThermostatPresence, 2),
                 UponorObjects.Controller(UponorController.ThermostatPresence, 3),
+                UponorObjects.Controller(UponorController.OutdoorSensorPresence, 0),
+                UponorObjects.Controller(UponorController.OutdoorSensorPresence, 1),
+                UponorObjects.Controller(UponorController.OutdoorSensorPresence, 2),
+                UponorObjects.Controller(UponorController.OutdoorSensorPresence, 3),
                 UponorObjects.System(UponorSystem.HcMode)
             };
 
@@ -313,6 +317,20 @@ namespace MBW.UponorApi
 
             result.AvailableControllers = tmpList.ToArray();
             result.AvailableThermostats = new int[MaxControllers + 1][];
+            tmpList.Clear();
+
+            // Outdoor sensors
+            for (byte i = 1; i <= MaxControllers; i++)
+            {
+                if (!values.TryGetValue(UponorObjects.Controller(UponorController.OutdoorSensorPresence, i),
+                    UponorProperties.Value, out val))
+                    continue;
+
+                if (val > 0)
+                    tmpList.Add(i);
+            }
+
+            result.AvailableOutdoorSensors = tmpList.ToArray();
             tmpList.Clear();
 
             // Thermostats

@@ -78,7 +78,7 @@ namespace MBW.Uponor2MQTT.Service
                 {
                     _logger.LogError(e, "An error occurred while performing the thermostats update");
                 }
-                
+
                 try
                 {
                     await _hassMqttManager.FlushAll(stoppingToken);
@@ -100,21 +100,26 @@ namespace MBW.Uponor2MQTT.Service
         {
             // Update system & controller details
             IEnumerable<int> objects = _detailsContainer.GetAvailableThermostats().SelectMany(c => new[]
-            {
-                // Generic
-                UponorObjects.Thermostat(UponorThermostats.RoomName, c.controller, c.thermostat),
-                UponorObjects.Thermostat(UponorThermostats.RoomInDemand, c.controller, c.thermostat),
-                // Humidity
-                UponorObjects.Thermostat(UponorThermostats.RhValue, c.controller, c.thermostat),
-                // Temperature
-                UponorObjects.Thermostat(UponorThermostats.RoomSetpoint, c.controller, c.thermostat),
-                UponorObjects.Thermostat(UponorThermostats.RoomTemperature, c.controller, c.thermostat),
-                // Alarms
-                UponorObjects.Thermostat(UponorThermostats.TamperIndication, c.controller, c.thermostat),
-                UponorObjects.Thermostat(UponorThermostats.BatteryAlarm, c.controller, c.thermostat),
-                UponorObjects.Thermostat(UponorThermostats.RfAlarm, c.controller, c.thermostat),
-                UponorObjects.Thermostat(UponorThermostats.TechnicalAlarm, c.controller, c.thermostat)
-            });
+                {
+                    // Generic
+                    UponorObjects.Thermostat(UponorThermostats.RoomName, c.controller, c.thermostat),
+                    UponorObjects.Thermostat(UponorThermostats.RoomInDemand, c.controller, c.thermostat),
+                    // Humidity
+                    UponorObjects.Thermostat(UponorThermostats.RhValue, c.controller, c.thermostat),
+                    // Temperature
+                    UponorObjects.Thermostat(UponorThermostats.RoomSetpoint, c.controller, c.thermostat),
+                    UponorObjects.Thermostat(UponorThermostats.RoomTemperature, c.controller, c.thermostat),
+                    // Alarms
+                    UponorObjects.Thermostat(UponorThermostats.TamperIndication, c.controller, c.thermostat),
+                    UponorObjects.Thermostat(UponorThermostats.BatteryAlarm, c.controller, c.thermostat),
+                    UponorObjects.Thermostat(UponorThermostats.RfAlarm, c.controller, c.thermostat),
+                    UponorObjects.Thermostat(UponorThermostats.TechnicalAlarm, c.controller, c.thermostat)
+                })
+                .Concat(_detailsContainer.GetAvailableOutdoorSensors().SelectMany(c => new[]
+                {
+                    // Outdoor sensor
+                    UponorObjects.Controller(UponorController.MeasuredOutdoorTemperature, c),
+                }));
 
             UponorResponseContainer values = await _uponorClient.ReadValues(objects, new[] { UponorProperties.Value }, stoppingToken);
 

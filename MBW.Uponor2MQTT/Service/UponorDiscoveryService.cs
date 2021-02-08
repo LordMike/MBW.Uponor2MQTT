@@ -117,23 +117,36 @@ namespace MBW.Uponor2MQTT.Service
             SystemProperties systemInfo = await _uponorClient.GetSystemInfo(stoppingToken);
 
             // Update details container
-            _detailsContainer.Update(systemInfo.AvailableControllers, systemInfo.AvailableThermostats, systemInfo.HcMode);
+            _detailsContainer.Update(systemInfo.AvailableControllers, systemInfo.AvailableThermostats, systemInfo.AvailableOutdoorSensors, systemInfo.HcMode);
 
-            // Update system & controller details
-            IEnumerable<int> objects = systemInfo.AvailableControllers.SelectMany(c => new[]
-            {
-                UponorObjects.System(UponorSystem.DeviceLostAlarm),
-                UponorObjects.System(UponorSystem.NoCommController1),
-                UponorObjects.System(UponorSystem.NoCommController2),
-                UponorObjects.System(UponorSystem.NoCommController3),
-                UponorObjects.System(UponorSystem.NoCommController4),
-                UponorObjects.System(UponorSystem.UhomeModuleId),
-                UponorObjects.System(UponorSystem.DeviceLostAlarm),
-                UponorObjects.Controller(UponorController.ControllerSwVersion, c)
-            });
+            // Batch all Value properties
+            IEnumerable<int> objects = new[]{
+                    UponorObjects.System(UponorSystem.DeviceLostAlarm),
+                    UponorObjects.System(UponorSystem.NoCommController1),
+                    UponorObjects.System(UponorSystem.NoCommController2),
+                    UponorObjects.System(UponorSystem.NoCommController3),
+                    UponorObjects.System(UponorSystem.NoCommController4),
+                    UponorObjects.System(UponorSystem.UhomeModuleId),
+                    UponorObjects.System(UponorSystem.DeviceLostAlarm),
+                }
+                .Concat(systemInfo.AvailableControllers.SelectMany(c => new[]
+                {
+                    UponorObjects.Controller(UponorController.ControllerSwVersion, c)
+                }))
+                .Concat(systemInfo.AvailableOutdoorSensors.SelectMany(s => new[]
+                {
+                    UponorObjects.Controller(UponorController.OutdoorSensorPresence, s)
+                }))
+                .Concat(_detailsContainer.GetAvailableThermostats().SelectMany(c => new[]
+                {
+                    UponorObjects.Thermostat(UponorThermostats.RoomName, c.controller, c.thermostat),
+                    UponorObjects.Thermostat(UponorThermostats.MinSetpoint, c.controller, c.thermostat),
+                    UponorObjects.Thermostat(UponorThermostats.MaxSetpoint, c.controller, c.thermostat)
+                }));
 
             UponorResponseContainer values = await _uponorClient.ReadValues(objects, new[] { UponorProperties.Value }, stoppingToken);
 
+            // Batch other properties
             // Update some system properties
             objects = systemInfo.AvailableControllers.SelectMany(c => new[]
             {
@@ -152,21 +165,6 @@ namespace MBW.Uponor2MQTT.Service
             }, stoppingToken);
 
             values.Merge(systemValues);
-
-            // Prepare thermostats
-            objects = _detailsContainer.GetAvailableThermostats().SelectMany(c => new[]
-            {
-                UponorObjects.Thermostat(UponorThermostats.RoomName, c.controller, c.thermostat),
-                UponorObjects.Thermostat(UponorThermostats.MinSetpoint, c.controller, c.thermostat),
-                UponorObjects.Thermostat(UponorThermostats.MaxSetpoint, c.controller, c.thermostat)
-            });
-
-            UponorResponseContainer thermostatValues = await _uponorClient.ReadValues(objects, new[]
-            {
-                UponorProperties.Value
-            }, stoppingToken);
-
-            values.Merge(thermostatValues);
 
             return values;
         }
@@ -203,6 +201,30 @@ namespace MBW.Uponor2MQTT.Service
                         device.Identifiers = new[] { deviceId };
                         device.Manufacturer = "Uponor";
                         device.ViaDevice = uHomeDeviceId;
+                    })
+                    .ConfigureAliveService();
+            }
+
+            // Outdoor sensors
+            foreach (int controller in _detailsContainer.GetAvailableOutdoorSensors())
+            {
+                string controllerId = HassUniqueIdBuilder.GetControllerDeviceId(controller);
+                const string entityId = "outdoor_sensor";
+
+                _hassMqttManager.ConfigureSensor<MqttSensor>(controllerId, entityId)
+                    .ConfigureTopics(HassTopicKind.State)
+                    .ConfigureDevice(device =>
+                    {
+                        device.Name = $"Uponor Outdoor Sensor {controller}";
+                        device.Identifiers = new[] { controllerId };
+                        device.Manufacturer = "Uponor";
+                        device.ViaDevice = controllerId;
+                    })
+                    .ConfigureDiscovery(discovery =>
+                    {
+                        discovery.Name = $"Controller {controller} Outdoor Sensor";
+                        discovery.DeviceClass = HassDeviceClass.Temperature;
+                        discovery.UnitOfMeasurement = "C";
                     })
                     .ConfigureAliveService();
             }
@@ -267,7 +289,7 @@ namespace MBW.Uponor2MQTT.Service
                 if (values.TryGetValue(UponorObjects.Thermostat(UponorThermostats.MaxSetpoint, controller, thermostat),
                     UponorProperties.Value, out floatVal))
                     climateBuilder.Discovery.MaxTemp = floatVal;
-                
+
                 // Temperature
                 IDiscoveryDocumentBuilder<MqttSensor> sensorBuilder = _hassMqttManager.ConfigureSensor<MqttSensor>(deviceId, "temperature")
                     .ConfigureTopics(HassTopicKind.State)

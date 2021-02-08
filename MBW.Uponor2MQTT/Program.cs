@@ -65,8 +65,8 @@ namespace MBW.Uponor2MQTT
         {
             services
                 .AddAndConfigureMqtt("Uponor2MQTT")
-                .Configure<CommonMqttConfiguration>(x=>x.ClientId = "uponor2mqtt")
-                .Configure<CommonMqttConfiguration>( context.Configuration.GetSection("MQTT"));
+                .Configure<CommonMqttConfiguration>(x => x.ClientId = "uponor2mqtt")
+                .Configure<CommonMqttConfiguration>(context.Configuration.GetSection("MQTT"));
 
             services
                 .Configure<HassConfiguration>(context.Configuration.GetSection("HASS"))
@@ -98,6 +98,7 @@ namespace MBW.Uponor2MQTT
             services
                 .AddSingleton<FeatureManager>()
                 .AddSingleton<FeatureBase, ControllerFeature>()
+                .AddSingleton<FeatureBase, ControllerOutdoorSensorFeature>()
                 .AddSingleton<FeatureBase, UhomeFeature>()
                 .AddSingleton<FeatureBase, ThermostatFeature>()
                 .AddSingleton<FeatureBase, ThermostatAlarmsFeature>()

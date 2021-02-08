@@ -20,12 +20,13 @@ namespace MBW.UponorApi
             };
         }
 
-        public void Update(int[] controllers, int[][] thermostats, HcMode hcMode)
+        public void Update(int[] controllers, int[][] thermostats, int[] outdoorSensors, HcMode hcMode)
         {
             _container = new Container
             {
                 _availableControllers = controllers,
                 _availableThermostats = thermostats,
+                _availableOutdoorSensors = outdoorSensors,
                 HcMode = hcMode
             };
         }
@@ -40,12 +41,18 @@ namespace MBW.UponorApi
             return _container._availableThermostats.SelectMany((x, idx) => x == null ? Array.Empty<(int, int)>() : x.Select(s => (idx, s)));
         }
 
+        public ICollection<int> GetAvailableOutdoorSensors()
+        {
+            return _container._availableOutdoorSensors;
+        }
+
         public HcMode HcMode => _container.HcMode;
 
         private class Container
         {
             public int[] _availableControllers;
             public int[][] _availableThermostats;
+            public int[] _availableOutdoorSensors;
             public HcMode HcMode;
         }
     }
