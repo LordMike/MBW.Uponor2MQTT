@@ -5,8 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using MBW.HassMQTT;
 using MBW.HassMQTT.CommonServices.AliveAndWill;
-using MBW.HassMQTT.DiscoveryModels;
 using MBW.HassMQTT.DiscoveryModels.Enum;
+using MBW.HassMQTT.DiscoveryModels.Interfaces;
 using MBW.HassMQTT.DiscoveryModels.Models;
 using MBW.HassMQTT.Extensions;
 using MBW.HassMQTT.Interfaces;
@@ -19,7 +19,6 @@ using MBW.UponorApi.Enums;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using HassDeviceClass = MBW.HassMQTT.DiscoveryModels.Enum.HassDeviceClass;
 
 namespace MBW.Uponor2MQTT.Service
 {
@@ -180,8 +179,10 @@ namespace MBW.Uponor2MQTT.Service
                     .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
                     .ConfigureDevice(device =>
                     {
+                        if (!device.Identifiers.Contains(uHomeDeviceId))
+                            device.Identifiers.Add(uHomeDeviceId);
+
                         device.Name = "Uponor U@Home";
-                        device.Identifiers = new[] { uHomeDeviceId };
                         device.Manufacturer = "Uponor";
                     })
                     .ConfigureAliveService();
@@ -190,15 +191,17 @@ namespace MBW.Uponor2MQTT.Service
                     .ConfigureTopics(HassTopicKind.State)
                     .ConfigureDevice(device =>
                     {
+                        if (!device.Identifiers.Contains(uHomeDeviceId))
+                            device.Identifiers.Add(uHomeDeviceId);
+
                         device.Name = "Uponor U@Home";
-                        device.Identifiers = new[] { uHomeDeviceId };
                         device.Manufacturer = "Uponor";
                     })
                     .ConfigureDiscovery(discovery =>
                     {
                         discovery.Name = "Uponor Average Temperature";
                         discovery.UnitOfMeasurement = "C";
-                        discovery.DeviceClass = HassDeviceClass.Temperature;
+                        discovery.DeviceClass = HassSensorDeviceClass.Temperature;
                     })
                     .ConfigureAliveService();
             }
@@ -213,8 +216,10 @@ namespace MBW.Uponor2MQTT.Service
                     .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
                     .ConfigureDevice(device =>
                     {
+                        if (!device.Identifiers.Contains(deviceId))
+                            device.Identifiers.Add(deviceId);
+
                         device.Name = $"Uponor Controller {controller}";
-                        device.Identifiers = new[] { deviceId };
                         device.Manufacturer = "Uponor";
                         device.ViaDevice = uHomeDeviceId;
                     })
@@ -231,27 +236,32 @@ namespace MBW.Uponor2MQTT.Service
                     .ConfigureTopics(HassTopicKind.State)
                     .ConfigureDevice(device =>
                     {
+                        if (!device.Identifiers.Contains(controllerId))
+                            device.Identifiers.Add(controllerId);
+
                         device.Name = $"Uponor Controller {controller}";
-                        device.Identifiers = new[] { controllerId };
                         device.Manufacturer = "Uponor";
                         device.ViaDevice = controllerId;
                     })
                     .ConfigureDiscovery(discovery =>
                     {
                         discovery.Name = $"Controller {controller} Outdoor Sensor";
-                        discovery.DeviceClass = HassDeviceClass.Temperature;
+                        discovery.DeviceClass = HassSensorDeviceClass.Temperature;
                         discovery.UnitOfMeasurement = "C";
+                        discovery.StateClass = HassStateClass.Measurement;
                     })
                     .ConfigureAliveService();
             }
 
             // Thermostats
-            void SetThermostatDeviceInfo<TEntity>(IDiscoveryDocumentBuilder<TEntity> builder, string name, string deviceId, string controllerId) where TEntity : MqttSensorDiscoveryBase
+            void SetThermostatDeviceInfo<TEntity>(IDiscoveryDocumentBuilder<TEntity> builder, string name, string deviceId, string controllerId) where TEntity : IHassDiscoveryDocument
             {
                 builder.ConfigureDevice(device =>
                 {
+                    if (!device.Identifiers.Contains(deviceId))
+                        device.Identifiers.Add(deviceId);
+
                     device.Name = name;
-                    device.Identifiers = new[] { deviceId };
                     device.Manufacturer = "Uponor";
                     device.ViaDevice = controllerId;
                 });
@@ -312,8 +322,9 @@ namespace MBW.Uponor2MQTT.Service
                     .ConfigureDiscovery(discovery =>
                     {
                         discovery.Name = $"{deviceName} Temperature";
-                        discovery.DeviceClass = HassDeviceClass.Temperature;
+                        discovery.DeviceClass = HassSensorDeviceClass.Temperature;
                         discovery.UnitOfMeasurement = "C";
+                        discovery.StateClass = HassStateClass.Measurement;
                     })
                     .ConfigureAliveService();
 
@@ -325,8 +336,9 @@ namespace MBW.Uponor2MQTT.Service
                     .ConfigureDiscovery(discovery =>
                     {
                         discovery.Name = $"{deviceName} Humidity";
-                        discovery.DeviceClass = HassDeviceClass.Humidity;
+                        discovery.DeviceClass = HassSensorDeviceClass.Humidity;
                         discovery.UnitOfMeasurement = "%";
+                        discovery.StateClass = HassStateClass.Measurement;
                     })
                     .ConfigureAliveService();
 
@@ -338,7 +350,7 @@ namespace MBW.Uponor2MQTT.Service
                     .ConfigureDiscovery(discovery =>
                     {
                         discovery.Name = $"{deviceName} Battery";
-                        discovery.DeviceClass = HassDeviceClass.Battery;
+                        discovery.DeviceClass = HassSensorDeviceClass.Battery;
                         discovery.UnitOfMeasurement = "%";
                     })
                     .ConfigureAliveService();
@@ -351,7 +363,7 @@ namespace MBW.Uponor2MQTT.Service
                     .ConfigureDiscovery(discovery =>
                     {
                         discovery.Name = $"{deviceName} Alarms";
-                        discovery.DeviceClass = HassDeviceClass.Problem;
+                        discovery.DeviceClass = HassBinarySensorDeviceClass.Problem;
                     })
                     .ConfigureAliveService();
 

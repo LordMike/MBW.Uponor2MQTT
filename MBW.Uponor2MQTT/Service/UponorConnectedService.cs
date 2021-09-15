@@ -84,14 +84,16 @@ namespace MBW.Uponor2MQTT.Service
                 .ConfigureTopics(HassTopicKind.State, HassTopicKind.JsonAttributes)
                 .ConfigureDevice(device =>
                 {
+                    if (!device.Identifiers.Contains(DeviceId))
+                        device.Identifiers.Add(DeviceId);
+
                     device.Name = "Uponor2MQTT";
-                    device.Identifiers = new[] { DeviceId };
                     device.SwVersion = _version;
                 })
                 .ConfigureDiscovery(discovery =>
                 {
                     discovery.Name = "Uponor2MQTT API Operational";
-                    discovery.DeviceClass = HassDeviceClass.Problem;
+                    discovery.DeviceClass = HassBinarySensorDeviceClass.Problem;
 
                     discovery.PayloadOn = ProblemMessage;
                     discovery.PayloadOff = OkMessage;
