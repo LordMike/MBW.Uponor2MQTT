@@ -200,7 +200,7 @@ namespace MBW.Uponor2MQTT.Service
                     .ConfigureDiscovery(discovery =>
                     {
                         discovery.Name = "Uponor Average Temperature";
-                        discovery.UnitOfMeasurement = "C";
+                        discovery.UnitOfMeasurement = "°C";
                         discovery.DeviceClass = HassSensorDeviceClass.Temperature;
                     })
                     .ConfigureAliveService();
@@ -247,7 +247,7 @@ namespace MBW.Uponor2MQTT.Service
                     {
                         discovery.Name = $"Controller {controller} Outdoor Sensor";
                         discovery.DeviceClass = HassSensorDeviceClass.Temperature;
-                        discovery.UnitOfMeasurement = "C";
+                        discovery.UnitOfMeasurement = "°C";
                         discovery.StateClass = HassStateClass.Measurement;
                     })
                     .ConfigureAliveService();
@@ -323,7 +323,7 @@ namespace MBW.Uponor2MQTT.Service
                     {
                         discovery.Name = $"{deviceName} Temperature";
                         discovery.DeviceClass = HassSensorDeviceClass.Temperature;
-                        discovery.UnitOfMeasurement = "C";
+                        discovery.UnitOfMeasurement = "°C";
                         discovery.StateClass = HassStateClass.Measurement;
                     })
                     .ConfigureAliveService();
