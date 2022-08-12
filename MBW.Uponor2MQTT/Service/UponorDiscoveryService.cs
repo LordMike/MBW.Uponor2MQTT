@@ -281,7 +281,7 @@ namespace MBW.Uponor2MQTT.Service
                 // Climate
                 IDiscoveryDocumentBuilder<MqttClimate> climateBuilder = _hassMqttManager.ConfigureSensor<MqttClimate>(deviceId, "temp")
                     .ConfigureTopics(HassTopicKind.JsonAttributes)
-                    .ConfigureTopics(HassTopicKind.CurrentTemperature, HassTopicKind.AwayModeState, HassTopicKind.Action, HassTopicKind.ModeState)
+                    .ConfigureTopics(HassTopicKind.CurrentTemperature, HassTopicKind.Action, HassTopicKind.ModeState)
                     .ConfigureTopics(HassTopicKind.TemperatureCommand, HassTopicKind.TemperatureState)
                     .ConfigureDiscovery(discovery =>
                     {

@@ -83,18 +83,18 @@ namespace MBW.Uponor2MQTT.Features
                     sensor.SetValue(HassTopicKind.ModeState, mode);
                 }
 
-                // Home/away
-                if (values.TryGetValue(
-                    UponorObjects.Thermostat(UponorThermostats.HomeAwayModeStatus, controller, thermostat),
-                    UponorProperties.Value, out intVal))
-                {
-                    if (intVal > 0)
-                        // Away
-                        sensor.SetValue(HassTopicKind.AwayModeState, "on");
-                    else
-                        // Home
-                        sensor.SetValue(HassTopicKind.AwayModeState, "off");
-                }
+                //// Home/away
+                //if (values.TryGetValue(
+                //    UponorObjects.Thermostat(UponorThermostats.HomeAwayModeStatus, controller, thermostat),
+                //    UponorProperties.Value, out intVal))
+                //{
+                //    if (intVal > 0)
+                //        // Away
+                //        sensor.SetValue(HassTopicKind.AwayModeState, "on");
+                //    else
+                //        // Home
+                //        sensor.SetValue(HassTopicKind.AwayModeState, "off");
+                //}
             }
         }
     }
