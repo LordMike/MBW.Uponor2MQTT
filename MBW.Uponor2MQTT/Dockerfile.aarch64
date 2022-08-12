@@ -1,10 +1,10 @@
 # https://hub.docker.com/_/microsoft-dotnet
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 
 COPY . .
 WORKDIR "/src/MBW.Uponor2MQTT/"
-RUN dotnet publish -c release -o /app -r linux-musl-arm64 --self-contained false
+RUN dotnet publish -c release -o /app
 
 # Final
 FROM mcr.microsoft.com/dotnet/runtime:5.0-focal-arm64v8
