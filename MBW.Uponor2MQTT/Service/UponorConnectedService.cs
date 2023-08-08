@@ -92,7 +92,7 @@ namespace MBW.Uponor2MQTT.Service
                 })
                 .ConfigureDiscovery(discovery =>
                 {
-                    discovery.Name = "Uponor2MQTT API Operational";
+                    discovery.Name = "API Operational";
                     discovery.DeviceClass = HassBinarySensorDeviceClass.Problem;
 
                     discovery.PayloadOn = ProblemMessage;
